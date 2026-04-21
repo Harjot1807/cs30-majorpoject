@@ -1,6 +1,6 @@
-// Project Title
-// Your Name
-// Date
+// Major Project
+// Harjot Singh
+// Started - March 21, 2026
 //
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
