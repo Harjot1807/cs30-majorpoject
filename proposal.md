@@ -14,6 +14,7 @@ Crossy Road
 
 # Nice to Have
 
+-glowing and getting bigger buttons if you hover
 -trains that you can not see and don't warn that they are coming - slower
 -tiles that destroy once you pass them
 -customizable skins that you can buy with coins
