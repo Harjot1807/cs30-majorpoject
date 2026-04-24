@@ -3,13 +3,16 @@
 // Started - March 21, 2026
 //
 // Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+// setting images as background
 
 let mMenuBg; 
+let controlBg;
 let state = "mainMenu";
 
+//preloads images
 function preload(){
   mMenuBg = loadImage("chicken.jpg");
+  controlBg = loadImage("control.webp");
 }
 
 function setup() {
@@ -18,11 +21,16 @@ function setup() {
 
 function draw() {
   displayMainMenu();
+  displayControl();
 }
 
 //functions that displays the main menu at the start of the game
 function displayMainMenu() {
+
+  //only works if the state is mainmenu
   if (state === "mainMenu"){
+
+    //loads the image as bg and makes the two boxes
     background(mMenuBg);
     fill('white');
     rect(width/4, height/4, width/2, height/6);
@@ -32,5 +40,36 @@ function displayMainMenu() {
     textSize((width+height)/20);
     text("Play", width/2, height*8/24);
     text("Controls", width/2, height*14/24);
+  }
+}
+
+function displayControl(){
+
+  if (state === "control"){
+    background(controlBg);
+  }
+}
+
+//when mouse is pressed
+function mousePressed(){
+
+  //happens when the state is mainemnu
+  if (state === "mainMenu") {
+
+    //if you press the play box
+    if (mouseX >= width/4 && mouseX <= width*3/4) {
+      if (mouseY >= height/4 && mouseY <= height*5/12){
+        state = "play";
+      }
+
+      //if you press the control box
+      else if (mouseY >= height/2 && mouseY <= height*2/3){
+        state = "control";
+      }
+    }
+  }
+
+  if (state === "control"){
+
   }
 }
