@@ -47,7 +47,18 @@ function displayControl(){
 
   if (state === "control"){
     background(controlBg);
+    fill('white');
+    rect(width/4, height/4, width/2, height/2);
+    fill('black');
+    textAlign(CENTER);
+    textSize((width+height)/32);
+    text("W = Walk UP\nS = Walk DOWN\nA = Walk LEFT\nD = Walk RIGHT", width/2, height/2);
+
   }
+}
+
+function displayPlay(){
+
 }
 
 //when mouse is pressed
@@ -71,5 +82,9 @@ function mousePressed(){
 
   if (state === "control"){
 
+  }
+
+  if (state === "play"){
+    
   }
 }
