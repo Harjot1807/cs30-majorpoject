@@ -81,7 +81,10 @@ function mousePressed(){
   }
 
   if (state === "control"){
-
+    rect();
+    rect();
+    
+    
   }
 
   if (state === "play"){
