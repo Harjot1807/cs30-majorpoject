@@ -52,13 +52,16 @@ function displayControl(){
     fill('black');
     textAlign(CENTER);
     textSize((width+height)/32);
-    text("W = Walk UP\nS = Walk DOWN\nA = Walk LEFT\nD = Walk RIGHT", width/2, height/2);
+    text("W = Walk UP\nS = Walk DOWN\nA = Walk LEFT\nD = Walk RIGHT\nEsc = Go BACK", width/2, height/2);
 
   }
 }
 
 function displayPlay(){
 
+  if(state === "play"){
+    
+  }
 }
 
 //when mouse is pressed
@@ -80,14 +83,15 @@ function mousePressed(){
     }
   }
 
-  if (state === "control"){
-    rect();
-    rect();
-    
-    
-  }
+
 
   if (state === "play"){
     
+  }
+}
+
+function keyPressed(){
+  if (keyCode === ESCAPE && state === "control"){
+    state = "mainMenu";
   }
 }
