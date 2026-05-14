@@ -8,6 +8,7 @@
 let mMenuBg; 
 let controlBg;
 let state = "mainMenu";
+let chicken;
 
 //preloads images
 function preload(){
@@ -15,13 +16,41 @@ function preload(){
   controlBg = loadImage("control.webp");
 }
 
+class Player {
+  constructor(){
+    this.gridSize = 40;
+    this.x = width/2;
+    this.y = height - this.gridSize *2;
+    this.size = this.gridSize * 0.8;
+  }
+
+  display(){
+    fill('yellow');
+    rectMode(CENTER);
+    rect(this.x, this.y, this.size, this.size);
+  }
+
+  move(xDirection, yDirection){
+    this.x = xDirection * this.gridSize;
+    this.y = yDirection * this.gridSize;
+  }
+}
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  chicken = new Player();
 }
 
 function draw() {
-  displayMainMenu();
-  displayControl();
+  if (state === "menu"){
+    displayMainMenu();
+  }
+  else if (state === "control"){
+    displayControl();
+  }
+  else if (state === "play"){
+    displayPlay();
+  }
 }
 
 //functions that displays the main menu at the start of the game
@@ -60,7 +89,8 @@ function displayControl(){
 function displayPlay(){
 
   if(state === "play"){
-    
+    background('lightgreen');
+    chicken.display();
   }
 }
 
