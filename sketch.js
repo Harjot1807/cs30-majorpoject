@@ -31,8 +31,8 @@ class Player {
   }
 
   move(xDirection, yDirection){
-    this.x = xDirection * this.gridSize;
-    this.y = yDirection * this.gridSize;
+    this.x += xDirection * this.gridSize;
+    this.y += yDirection * this.gridSize;
   }
 }
 
@@ -42,7 +42,7 @@ function setup() {
 }
 
 function draw() {
-  if (state === "menu"){
+  if (state === "mainMenu"){
     displayMainMenu();
   }
   else if (state === "control"){
@@ -76,6 +76,7 @@ function displayControl(){
 
   if (state === "control"){
     background(controlBg);
+    rectMode(CORNER);
     fill('white');
     rect(width/4, height/4, width/2, height/2);
     fill('black');
@@ -123,5 +124,17 @@ function mousePressed(){
 function keyPressed(){
   if (keyCode === ESCAPE && state === "control"){
     state = "mainMenu";
+  }
+  else if(state === "play" && key === "w"){
+    chicken.move(0,-1);
+  }
+  else if(state === "play" && key === "s"){
+    chicken.move(0,1);
+  }
+  else if(state === "play" && key === "a"){
+    chicken.move(-1,0);
+  }
+  else if(state === "play" && key === "d"){
+    chicken.move(1,0);
   }
 }
