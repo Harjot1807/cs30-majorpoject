@@ -6,7 +6,7 @@ Crossy Road - You use a character to get as far as possible while trying to dodg
 - sound effects - death and movement
 - water with logs
 - trains that you can see and warn that they are coming - faster
-- charcter that you can be move
+- charcter that you can be move 
 - kill condition
 - screen that constantly keeps moving
 - path that always allow a safe path
