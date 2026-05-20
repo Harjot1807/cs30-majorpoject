@@ -14,6 +14,7 @@ let chickenBack;
 let chickenLeft;
 let chickenRight;
 let currentDirection = "front";
+let movementSound;
 
 //preloads images
 function preload(){
@@ -23,9 +24,32 @@ function preload(){
   chickenBack = loadImage("chickenB.png");
   chickenLeft = loadImage("chickenL.png");
   chickenRight = loadImage("chickenR.png");
+  movementSound = loadSound("movement.mp3");
+}
+
+class Car{
+  constructor(x, y, speed, width, height){
+    this.x = x;
+    this.y = y;
+    this.speed = speed;
+    this.width = width;
+    this.height = height;
+  }
+
+  display(){
+    this.x += this.speed;
+
+    if (this.speed > 0 && this.x > width + this.width) {
+      this.x = -this.width;
+    }
+    if (this.speed < 0 && this.x < 0 - this.width){
+      this.x = this.width;
+    }
+  }
 }
 
 class Player {
+
   constructor(){
     this.gridSize = 40;
     this.x = width/2;
@@ -45,18 +69,23 @@ class Player {
   move(xDirection, yDirection){
     this.x += xDirection * this.gridSize;
     this.y += yDirection * this.gridSize;
+    movementSound.play();
   }
 
   imageChoose(){
+
     if (currentDirection === "front"){
       return chickenFront;
     }
+
     else if(currentDirection === "back"){
       return chickenBack;
     }
+
     else if(currentDirection === "left"){
       return chickenLeft;
     }
+
     else if(currentDirection === "right"){
       return chickenRight;
     }
@@ -66,15 +95,19 @@ class Player {
 function setup() {
   createCanvas(windowWidth, windowHeight);
   chicken = new Player();
+  let carArray = [];
+  carArray.push();
 }
 
 function draw() {
   if (state === "mainMenu"){
     displayMainMenu();
   }
+
   else if (state === "control"){
     displayControl();
   }
+
   else if (state === "play"){
     displayPlay();
   }
@@ -120,6 +153,7 @@ function displayPlay(){
     background('lightgreen');
     chicken.display();
   }
+
 }
 
 //when mouse is pressed
@@ -152,18 +186,22 @@ function keyPressed(){
   if (keyCode === ESCAPE && state === "control"){
     state = "mainMenu";
   }
+
   else if(state === "play" && key === "w"){
     currentDirection = "front";
     chicken.move(0,-1);
   }
+
   else if(state === "play" && key === "s"){
     currentDirection = "back";
     chicken.move(0,1);
   }
+
   else if(state === "play" && key === "a"){
     currentDirection = "left";
     chicken.move(-1,0);
   }
+
   else if(state === "play" && key === "d"){
     currentDirection = "right";
     chicken.move(1,0);
