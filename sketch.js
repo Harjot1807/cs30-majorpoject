@@ -5,18 +5,22 @@
 // Extra for Experts:
 // setting images as background
 
+//setting up the variables for the rest of the code
+let state = "mainMenu";
+let currentDirection = "front";
+let carArray = [];
+
+//setting up variables for preloads
 let mMenuBg; 
 let controlBg;
-let state = "mainMenu";
 let chicken;
 let chickenFront;
 let chickenBack;
 let chickenLeft;
 let chickenRight;
-let currentDirection = "front";
 let movementSound;
 
-//preloads images
+//preloads images and sounds
 function preload(){
   mMenuBg = loadImage("chicken.jpg");
   controlBg = loadImage("control.webp");
@@ -27,29 +31,44 @@ function preload(){
   movementSound = loadSound("movement.mp3");
 }
 
+//class for the cars that keep on moving and come back
 class Car{
-  constructor(x, y, speed, width, height){
+
+  //gives the car its inital values
+  constructor(x, y, speed, w, h){
     this.x = x;
     this.y = y;
     this.speed = speed;
-    this.width = width;
-    this.height = height;
+    this.w = w;
+    this.h = h;
   }
 
-  display(){
+  //moves the car x value depending on its speed
+  update(){
     this.x += this.speed;
 
-    if (this.speed > 0 && this.x > width + this.width) {
-      this.x = -this.width;
+    //if the car goes out of the right side
+    if (this.speed > 0 && this.x > width + this.w) {
+      this.x = -this.w;
     }
-    if (this.speed < 0 && this.x < 0 - this.width){
-      this.x = this.width;
+
+    //if the car goes out of the left side
+    if (this.speed < 0 && this.x < 0 - this.w){
+      this.x = width + this.w;
     }
+  }
+
+  //displays the car after it updates
+  display(){
+    fill('red');
+    rect(this.x, this.y, this.w, this.h);
   }
 }
 
+//class for the chicken that the player uses
 class Player {
 
+  //gives the initial values of the chicken
   constructor(){
     this.gridSize = 40;
     this.x = width/2;
@@ -58,14 +77,18 @@ class Player {
     this.direction = currentDirection;
   }
 
+  //displays the chicken after movement
   display(){
     fill('yellow');
     rectMode(CENTER);
     rect(this.x, this.y, this.size, this.size);
     imageMode(CENTER);
+
+    //chooses the image using the imagething
     image(this.imageChoose(), this.x, this.y, this.size, this.size);
   }
 
+  //moves the character based on the key pressed
   move(xDirection, yDirection){
     this.x += xDirection * this.gridSize;
     this.y += yDirection * this.gridSize;
@@ -95,8 +118,8 @@ class Player {
 function setup() {
   createCanvas(windowWidth, windowHeight);
   chicken = new Player();
-  let carArray = [];
-  carArray.push();
+  carArray.push(new Car(100, height - 150, 4, 60, 30));
+  carArray.push(new Car(200, height - 300, -3, 80, 35));
 }
 
 function draw() {
@@ -151,6 +174,10 @@ function displayPlay(){
 
   if(state === "play"){
     background('lightgreen');
+    for(let i = 0; i<carArray.length; i++){
+      carArray[i].update();
+      carArray[i].display();
+    }
     chicken.display();
   }
 
