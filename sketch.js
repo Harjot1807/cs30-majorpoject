@@ -95,26 +95,32 @@ class Player {
     movementSound.play();
   }
 
+  //uses the variable currentdirection of the chicken to choose image to display
   imageChoose(){
 
+    //if last key was w forwards
     if (currentDirection === "front"){
       return chickenFront;
     }
 
+    //if last key was s bacwards
     else if(currentDirection === "back"){
       return chickenBack;
     }
 
+    //if last key was a left
     else if(currentDirection === "left"){
       return chickenLeft;
     }
 
+    //if last key was d right
     else if(currentDirection === "right"){
       return chickenRight;
     }
   }
 }
 
+//sets up the pllayer character and the cars
 function setup() {
   createCanvas(windowWidth, windowHeight);
   chicken = new Player();
@@ -122,15 +128,20 @@ function setup() {
   carArray.push(new Car(200, height - 300, -3, 80, 35));
 }
 
+//choooses between which state to draw
 function draw() {
+
+  //if state is mainmenu
   if (state === "mainMenu"){
     displayMainMenu();
   }
 
+  //if state is control
   else if (state === "control"){
     displayControl();
   }
 
+  //if state is play
   else if (state === "play"){
     displayPlay();
   }
@@ -155,9 +166,13 @@ function displayMainMenu() {
   }
 }
 
+//function that displays the control menu
 function displayControl(){
 
+  //only works if the state is control
   if (state === "control"){
+
+    //loads the box, background and the text
     background(controlBg);
     rectMode(CORNER);
     fill('white');
@@ -170,14 +185,21 @@ function displayControl(){
   }
 }
 
+
+//functions that actually lets the gameplay
 function displayPlay(){
 
+  //only work if the game is in the play state
   if(state === "play"){
+
+    //displays the background and loads the cars
     background('lightgreen');
     for(let i = 0; i<carArray.length; i++){
       carArray[i].update();
       carArray[i].display();
     }
+
+    //displays the chicken
     chicken.display();
   }
 
@@ -202,33 +224,47 @@ function mousePressed(){
     }
   }
 
-
-
-  if (state === "play"){
-    
-  }
 }
 
+//when a specific key is pressed
 function keyPressed(){
+
+  //if escape is pressed in the control
   if (keyCode === ESCAPE && state === "control"){
+
+    //returns to menu
     state = "mainMenu";
   }
 
+
+  //if escape is pressed in play
+  if (keyCode === ESCAPE && state === "play"){
+
+    //returns to menu
+    state = "mainMenu";
+  }
+
+  //if in play and w is pressed
   else if(state === "play" && key === "w"){
+
+    //changes direction to front to replace the image and moves the chicken
     currentDirection = "front";
     chicken.move(0,-1);
   }
 
+  //changes direction to front to replace the image and moves the chicken
   else if(state === "play" && key === "s"){
     currentDirection = "back";
     chicken.move(0,1);
   }
 
+  //changes direction to front to replace the image and moves the chicken
   else if(state === "play" && key === "a"){
     currentDirection = "left";
     chicken.move(-1,0);
   }
 
+  //changes direction to front to replace the image and moves the chicken
   else if(state === "play" && key === "d"){
     currentDirection = "right";
     chicken.move(1,0);
