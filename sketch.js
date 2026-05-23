@@ -9,6 +9,7 @@
 let state = "mainMenu";
 let currentDirection = "front";
 let carArray = [];
+let cameraY = 0;
 
 //setting up variables for preloads
 let mMenuBg; 
@@ -19,6 +20,9 @@ let chickenBack;
 let chickenLeft;
 let chickenRight;
 let movementSound;
+let gridSize = 40;
+let rows = [];
+let scrollY = 0;
 
 //preloads images and sounds
 function preload(){
@@ -61,7 +65,8 @@ class Car{
   //displays the car after it updates
   display(){
     fill('red');
-    rect(this.x, this.y, this.w, this.h);
+    rectMode(CORNER);
+    rect(this.x, this.y + scrollY, this.w, this.h);
   }
 }
 
@@ -70,10 +75,9 @@ class Player {
 
   //gives the initial values of the chicken
   constructor(){
-    this.gridSize = 40;
-    this.x = width/2;
-    this.y = height - this.gridSize *2;
-    this.size = this.gridSize * 0.8;
+    this.x = Math.floor(width/ (gridSize * 2)) * gridSize + gridSize/2;
+    this.y = height - gridSize *2 + gridSize/2;
+    this.size = gridSize * 0.8;
     this.direction = currentDirection;
   }
 
@@ -81,18 +85,35 @@ class Player {
   display(){
     fill('yellow');
     rectMode(CENTER);
-    rect(this.x, this.y, this.size, this.size);
+
+    let screenY = this.y + scrollY;
+    rect(this.x, screenY, this.size, this.size);
     imageMode(CENTER);
 
     //chooses the image using the imagething
-    image(this.imageChoose(), this.x, this.y, this.size, this.size);
+    let img = this.imageChoose();
+    if (img){
+
+      image(img, this.x, screenY, this.size, this.size);
+    }
   }
 
   //moves the character based on the key pressed
   move(xDirection, yDirection){
-    this.x += xDirection * this.gridSize;
-    this.y += yDirection * this.gridSize;
-    movementSound.play();
+    this.x += xDirection * gridSize;
+    this.y += yDirection * gridSize;
+
+    if(yDirection < 0){
+      cameraY += gridSize;
+    }
+    else if(yDirection > 0 && cameraY > 0) {
+      cameraY -= gridSize;
+    }
+
+    if (movementSound && typeof movementSound.play === 'function'){
+
+      movementSound.play();
+    }
   }
 
   //uses the variable currentdirection of the chicken to choose image to display
@@ -124,8 +145,12 @@ class Player {
 function setup() {
   createCanvas(windowWidth, windowHeight);
   chicken = new Player();
-  carArray.push(new Car(100, height - 150, 4, 60, 30));
-  carArray.push(new Car(200, height - 300, -3, 80, 35));
+
+  let totalRows = Math.ceil(height/gridSize) + 5;
+  for (let i = 0; i < totalRows; i++){
+    let yPos = height - (i*gridSize);
+    generateInitialRow(yPos);
+  }
 }
 
 //choooses between which state to draw
@@ -147,12 +172,25 @@ function draw() {
   }
 }
 
+function generateInitialRow(yPos){
+  let type = "grass";
+  if (yPos < height - gridSize * 3){
+    type = random(["grass", "road", "road"]);
+  }
+
+  rows.push({y : yPos, type: type});
+
+  if(type === "road") {
+    spawnCarRow(yPos);
+  }
+}
+
 //functions that displays the main menu at the start of the game
 function displayMainMenu() {
 
   //only works if the state is mainmenu
   if (state === "mainMenu"){
-
+    rectMode(CORNER)  ;
     //loads the image as bg and makes the two boxes
     background(mMenuBg);
     fill('white');
@@ -194,6 +232,22 @@ function displayPlay(){
 
     //displays the background and loads the cars
     background('lightgreen');
+    deleteAndManageInfiteGrid();
+
+    rectMode(CORNER);
+    for (let r of rows){
+      let screenY = r.y + scrollY;
+      if (r.type === "grass"){
+        fill("lightgreen");
+      }
+      else if (r.type === "road"){
+        fill("darkgray");
+      }
+      
+      noStroke();
+      rect(0, screenY, width, gridSize);
+    }
+
     for(let i = 0; i<carArray.length; i++){
       carArray[i].update();
       carArray[i].display();
@@ -270,3 +324,45 @@ function keyPressed(){
     chicken.move(1,0);
   }
 }
+
+function spawnCarRow(yPos){
+  let speed = random(2, 5);
+  if (random(1) > 0.5) {
+    speed *= -1;
+  }
+  let carWidth = random(60, 90);
+  let carX = speed > 0 ? -carWidth : width + carWidth;
+
+  carArray.push(new Car(carX, yPos + 5, speed, carWidth, gridSize - 10))
+}
+
+function deleteAndManageInfiteGrid(){
+  scrollY = lerp(scrollY, cameraY, 0.1);
+
+  for (let i = rows.length - 1; i >= 0; i--){
+    let screenY = rows[i].y + scrollY;
+    if (screenY > height + gridSize){
+      let targetY = rows[i].y;
+      carArray = carArray.filter(car => car.y !== targetY + 5);
+      rows.splice(i, 1);
+    }
+  }
+
+  let highestY = height;
+  for (let r of rows){
+    if (r.y < highestY) {
+      highestY = r.y;
+    }
+  }
+
+  while (highestY + scrollY > -gridSize * 2) {
+    highestY -= gridSize;
+    let type = random(["grass", "road"]);
+    rows.push({y :highestY, type: type});
+
+    if (type === "road") {
+      spawnCarRow(highestY);
+    }
+  }
+}
+
