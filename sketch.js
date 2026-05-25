@@ -337,7 +337,7 @@ function spawnCarRow(yPos){
 }
 
 function deleteAndManageInfiteGrid(){
-  scrollY = lerp(scrollY, cameraY, 0.1);
+  scrollY = lerp(scrollY, cameraY, 0.01);
 
   for (let i = rows.length - 1; i >= 0; i--){
     let screenY = rows[i].y + scrollY;
