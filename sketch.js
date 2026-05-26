@@ -3,16 +3,20 @@
 // Started - March 21, 2026
 //
 // Extra for Experts:
+//favicon
+//lerp()
+//filter
 // setting images as background
 
 //setting up the variables for the rest of the code
 let state = "mainMenu";
 let currentDirection = "front";
 let carArray = [];
+let logArray = [];
 let cameraY = 0;
 
 //setting up variables for preloads
-let mMenuBg; 
+let mMenuBg;
 let controlBg;
 let chicken;
 let chickenFront;
@@ -25,7 +29,7 @@ let rows = [];
 let scrollY = 0;
 
 //preloads images and sounds
-function preload(){
+function preload() {
   mMenuBg = loadImage("chicken.jpg");
   controlBg = loadImage("control.webp");
   chickenFront = loadImage("chickenF.png");
@@ -36,10 +40,10 @@ function preload(){
 }
 
 //class for the cars that keep on moving and come back
-class Car{
+class Car {
 
   //gives the car its inital values
-  constructor(x, y, speed, w, h){
+  constructor(x, y, speed, w, h) {
     this.x = x;
     this.y = y;
     this.speed = speed;
@@ -48,7 +52,7 @@ class Car{
   }
 
   //moves the car x value depending on its speed
-  update(){
+  update() {
     this.x += this.speed;
 
     //if the car goes out of the right side
@@ -57,32 +61,64 @@ class Car{
     }
 
     //if the car goes out of the left side
-    if (this.speed < 0 && this.x < 0 - this.w){
+    if (this.speed < 0 && this.x < 0 - this.w) {
       this.x = width + this.w;
     }
   }
 
   //displays the car after it updates
-  display(){
+  display() {
     fill('red');
     rectMode(CORNER);
     rect(this.x, this.y + scrollY, this.w, this.h);
   }
 }
 
+class Log {
+
+  constructor(x, y, speed, w, h) {
+    this.x = x;
+    this.y = y;
+    this.speed = speed;
+    this.w = w;
+    this.h = h;
+  }
+
+  update() {
+    this.x += this.speed;
+
+    //if the car goes out of the right side
+    if (this.speed > 0 && this.x > width + this.w) {
+      this.x = -this.w;
+    }
+
+    //if the car goes out of the left side
+    if (this.speed < 0 && this.x < 0 - this.w) {
+      this.x = width + this.w;
+    }
+  }
+
+  display() {
+    fill('brown');
+    rectMode(CORNER);
+    rect(this.x, this.y + scrollY, this.w, this.h);
+  }
+
+}
+
 //class for the chicken that the player uses
 class Player {
 
   //gives the initial values of the chicken
-  constructor(){
-    this.x = Math.floor(width/ (gridSize * 2)) * gridSize + gridSize/2;
-    this.y = height - gridSize *2 + gridSize/2;
+  constructor() {
+    this.x = Math.floor(width / (gridSize * 2)) * gridSize + gridSize / 2;
+    this.y = height - gridSize * 2 + gridSize / 2;
     this.size = gridSize * 0.8;
     this.direction = currentDirection;
   }
 
   //displays the chicken after movement
-  display(){
+  display() {
     fill('yellow');
     rectMode(CENTER);
 
@@ -92,50 +128,50 @@ class Player {
 
     //chooses the image using the imagething
     let img = this.imageChoose();
-    if (img){
+    if (img) {
 
       image(img, this.x, screenY, this.size, this.size);
     }
   }
 
   //moves the character based on the key pressed
-  move(xDirection, yDirection){
+  move(xDirection, yDirection) {
     this.x += xDirection * gridSize;
     this.y += yDirection * gridSize;
 
-    if(yDirection < 0){
+    if (yDirection < 0) {
       cameraY += gridSize;
     }
-    else if(yDirection > 0 && cameraY > 0) {
+    else if (yDirection > 0 && cameraY > 0) {
       cameraY -= gridSize;
     }
 
-    if (movementSound && typeof movementSound.play === 'function'){
+    if (movementSound && typeof movementSound.play === 'function') {
 
       movementSound.play();
     }
   }
 
   //uses the variable currentdirection of the chicken to choose image to display
-  imageChoose(){
+  imageChoose() {
 
     //if last key was w forwards
-    if (currentDirection === "front"){
+    if (currentDirection === "front") {
       return chickenFront;
     }
 
     //if last key was s bacwards
-    else if(currentDirection === "back"){
+    else if (currentDirection === "back") {
       return chickenBack;
     }
 
     //if last key was a left
-    else if(currentDirection === "left"){
+    else if (currentDirection === "left") {
       return chickenLeft;
     }
 
     //if last key was d right
-    else if(currentDirection === "right"){
+    else if (currentDirection === "right") {
       return chickenRight;
     }
   }
@@ -146,9 +182,9 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   chicken = new Player();
 
-  let totalRows = Math.ceil(height/gridSize) + 5;
-  for (let i = 0; i < totalRows; i++){
-    let yPos = height - (i*gridSize);
+  let totalRows = Math.ceil(height / gridSize) + 5;
+  for (let i = 0; i < totalRows; i++) {
+    let yPos = height - i * gridSize;
     generateInitialRow(yPos);
   }
 }
@@ -157,31 +193,35 @@ function setup() {
 function draw() {
 
   //if state is mainmenu
-  if (state === "mainMenu"){
+  if (state === "mainMenu") {
     displayMainMenu();
   }
 
   //if state is control
-  else if (state === "control"){
+  else if (state === "control") {
     displayControl();
   }
 
   //if state is play
-  else if (state === "play"){
+  else if (state === "play") {
     displayPlay();
   }
 }
 
-function generateInitialRow(yPos){
+function generateInitialRow(yPos) {
   let type = "grass";
-  if (yPos < height - gridSize * 3){
-    type = random(["grass", "road", "road"]);
+  if (yPos < height - gridSize * 3) {
+    type = random(["grass", "road", "road", "river"]);
   }
 
-  rows.push({y : yPos, type: type});
+  rows.push({ y: yPos, type: type });
 
-  if(type === "road") {
+  if (type === "road") {
     spawnCarRow(yPos);
+  }
+
+  if (type === "river") {
+    spawnRiver(yPos);
   }
 }
 
@@ -189,68 +229,76 @@ function generateInitialRow(yPos){
 function displayMainMenu() {
 
   //only works if the state is mainmenu
-  if (state === "mainMenu"){
-    rectMode(CORNER)  ;
+  if (state === "mainMenu") {
+    rectMode(CORNER);
     //loads the image as bg and makes the two boxes
     background(mMenuBg);
     fill('white');
-    rect(width/4, height/4, width/2, height/6);
-    rect(width/4, height/2, width/2, height/6);
+    rect(width / 4, height / 4, width / 2, height / 6);
+    rect(width / 4, height / 2, width / 2, height / 6);
     fill('black');
     textAlign(CENTER, CENTER);
-    textSize((width+height)/20);
-    text("Play", width/2, height*8/24);
-    text("Controls", width/2, height*14/24);
+    textSize((width + height) / 20);
+    text("Play", width / 2, height * 8 / 24);
+    text("Controls", width / 2, height * 14 / 24);
   }
 }
 
 //function that displays the control menu
-function displayControl(){
+function displayControl() {
 
   //only works if the state is control
-  if (state === "control"){
+  if (state === "control") {
 
     //loads the box, background and the text
     background(controlBg);
     rectMode(CORNER);
     fill('white');
-    rect(width/4, height/4, width/2, height/2);
+    rect(width / 4, height / 4, width / 2, height / 2);
     fill('black');
     textAlign(CENTER);
-    textSize((width+height)/32);
-    text("W = Walk UP\nS = Walk DOWN\nA = Walk LEFT\nD = Walk RIGHT\nEsc = Go BACK", width/2, height/2);
+    textSize((width + height) / 32);
+    text("W = Walk UP\nS = Walk DOWN\nA = Walk LEFT\nD = Walk RIGHT\nEsc = Go BACK", width / 2, height / 2);
 
   }
 }
 
 
 //functions that actually lets the gameplay
-function displayPlay(){
+function displayPlay() {
 
   //only work if the game is in the play state
-  if(state === "play"){
+  if (state === "play") {
 
     //displays the background and loads the cars
     background('lightgreen');
     deleteAndManageInfiteGrid();
 
     rectMode(CORNER);
-    for (let r of rows){
+    for (let r of rows) {
       let screenY = r.y + scrollY;
-      if (r.type === "grass"){
+      if (r.type === "grass") {
         fill("lightgreen");
       }
-      else if (r.type === "road"){
+      else if (r.type === "road") {
         fill("darkgray");
       }
-      
+      else if (r.type === "river") {
+        fill("blue");
+      }
+
       noStroke();
       rect(0, screenY, width, gridSize);
     }
 
-    for(let i = 0; i<carArray.length; i++){
+    for (let i = 0; i < carArray.length; i++) {
       carArray[i].update();
       carArray[i].display();
+    }
+
+    for (let i = 0; i < logArray.length; i++) {
+      logArray[i].update();
+      logArray[i].display();
     }
 
     //displays the chicken
@@ -260,19 +308,19 @@ function displayPlay(){
 }
 
 //when mouse is pressed
-function mousePressed(){
+function mousePressed() {
 
   //happens when the state is mainemnu
   if (state === "mainMenu") {
 
     //if you press the play box
-    if (mouseX >= width/4 && mouseX <= width*3/4) {
-      if (mouseY >= height/4 && mouseY <= height*5/12){
+    if (mouseX >= width / 4 && mouseX <= width * 3 / 4) {
+      if (mouseY >= height / 4 && mouseY <= height * 5 / 12) {
         state = "play";
       }
 
       //if you press the control box
-      else if (mouseY >= height/2 && mouseY <= height*2/3){
+      else if (mouseY >= height / 2 && mouseY <= height * 2 / 3) {
         state = "control";
       }
     }
@@ -281,10 +329,10 @@ function mousePressed(){
 }
 
 //when a specific key is pressed
-function keyPressed(){
+function keyPressed() {
 
   //if escape is pressed in the control
-  if (keyCode === ESCAPE && state === "control"){
+  if (keyCode === ESCAPE && state === "control") {
 
     //returns to menu
     state = "mainMenu";
@@ -292,40 +340,40 @@ function keyPressed(){
 
 
   //if escape is pressed in play
-  if (keyCode === ESCAPE && state === "play"){
+  if (keyCode === ESCAPE && state === "play") {
 
     //returns to menu
     state = "mainMenu";
   }
 
   //if in play and w is pressed
-  else if(state === "play" && key === "w"){
+  else if (state === "play" && key === "w") {
 
     //changes direction to front to replace the image and moves the chicken
     currentDirection = "front";
-    chicken.move(0,-1);
+    chicken.move(0, -1);
   }
 
   //changes direction to front to replace the image and moves the chicken
-  else if(state === "play" && key === "s"){
+  else if (state === "play" && key === "s") {
     currentDirection = "back";
-    chicken.move(0,1);
+    chicken.move(0, 1);
   }
 
   //changes direction to front to replace the image and moves the chicken
-  else if(state === "play" && key === "a"){
+  else if (state === "play" && key === "a") {
     currentDirection = "left";
-    chicken.move(-1,0);
+    chicken.move(-1, 0);
   }
 
   //changes direction to front to replace the image and moves the chicken
-  else if(state === "play" && key === "d"){
+  else if (state === "play" && key === "d") {
     currentDirection = "right";
-    chicken.move(1,0);
+    chicken.move(1, 0);
   }
 }
 
-function spawnCarRow(yPos){
+function spawnCarRow(yPos) {
   let speed = random(2, 5);
   if (random(1) > 0.5) {
     speed *= -1;
@@ -333,23 +381,38 @@ function spawnCarRow(yPos){
   let carWidth = random(60, 90);
   let carX = speed > 0 ? -carWidth : width + carWidth;
 
-  carArray.push(new Car(carX, yPos + 5, speed, carWidth, gridSize - 10))
+  carArray.push(new Car(carX, yPos + 5, speed, carWidth, gridSize - 10));
 }
 
-function deleteAndManageInfiteGrid(){
+function spawnRiver(yPos) {
+  let speed = random(2, 5);
+  if (random(1) > 0.5) {
+    speed *= -1;
+  }
+  let logWidth = random(60, 90);
+  let logX = speed > 0 ? -logWidth : width + logWidth;
+
+  logArray.push(new Log(logX, yPos + 5, speed, logWidth, gridSize - 10));
+}
+
+function deleteAndManageInfiteGrid() {
   scrollY = lerp(scrollY, cameraY, 0.01);
 
-  for (let i = rows.length - 1; i >= 0; i--){
+  for (let i = rows.length - 1; i >= 0; i--) {
     let screenY = rows[i].y + scrollY;
-    if (screenY > height + gridSize){
+    if (screenY > height + gridSize) {
       let targetY = rows[i].y;
       carArray = carArray.filter(car => car.y !== targetY + 5);
+      logArray = logArray.filter(log => log.y !== targetY + 5);
       rows.splice(i, 1);
     }
   }
 
+
+
+
   let highestY = height;
-  for (let r of rows){
+  for (let r of rows) {
     if (r.y < highestY) {
       highestY = r.y;
     }
@@ -357,11 +420,15 @@ function deleteAndManageInfiteGrid(){
 
   while (highestY + scrollY > -gridSize * 2) {
     highestY -= gridSize;
-    let type = random(["grass", "road"]);
-    rows.push({y :highestY, type: type});
+    let type = random(["grass", "road", "river", "road"]);
+    rows.push({ y: highestY, type: type });
 
     if (type === "road") {
       spawnCarRow(highestY);
+    }
+
+    if (type === "river") {
+      spawnRiver(highestY);
     }
   }
 }
