@@ -13,7 +13,9 @@ let state = "mainMenu";
 let currentDirection = "front";
 let carArray = [];
 let logArray = [];
+let trainArray = [];
 let cameraY = 0;
+let trainSpeed = 60;
 
 //setting up variables for preloads
 let mMenuBg;
@@ -24,6 +26,11 @@ let chickenBack;
 let chickenLeft;
 let chickenRight;
 let movementSound;
+let logPicture;
+let carPictureL;
+let carPictureR;
+let trainPictureL;
+let trainPictureR;
 let gridSize = 40;
 let rows = [];
 let scrollY = 0;
@@ -87,12 +94,12 @@ class Log {
   update() {
     this.x += this.speed;
 
-    //if the car goes out of the right side
+    //if the log goes out of the right side
     if (this.speed > 0 && this.x > width + this.w) {
       this.x = -this.w;
     }
 
-    //if the car goes out of the left side
+    //if the log goes out of the left side
     if (this.speed < 0 && this.x < 0 - this.w) {
       this.x = width + this.w;
     }
@@ -100,6 +107,38 @@ class Log {
 
   display() {
     fill('brown');
+    rectMode(CORNER);
+    rect(this.x, this.y + scrollY, this.w, this.h);
+  }
+
+}
+
+class Train {
+
+  constructor(x, y, speed, w, h) {
+    this.x = x;
+    this.y = y;
+    this.speed = speed;
+    this.w = w;
+    this.h = h;
+  }
+
+  update() {
+    this.x += this.speed;
+
+    //if the train goes out of the right side
+    if (this.speed > 0 && this.x > width + this.w) {
+      this.x = -this.w;
+    }
+
+    //if the train goes out of the left side
+    if (this.speed < 0 && this.x < 0 - this.w) {
+      this.x = width + this.w;
+    }
+  }
+
+  display() {
+    fill('purple');
     rectMode(CORNER);
     rect(this.x, this.y + scrollY, this.w, this.h);
   }
@@ -211,7 +250,7 @@ function draw() {
 function generateInitialRow(yPos) {
   let type = "grass";
   if (yPos < height - gridSize * 3) {
-    type = random(["grass", "road", "road", "river"]);
+    type = random(["grass", "road", "road", "river", "grass", "track", "river", "road"]);
   }
 
   rows.push({ y: yPos, type: type });
@@ -222,6 +261,10 @@ function generateInitialRow(yPos) {
 
   if (type === "river") {
     spawnRiver(yPos);
+  }
+
+  if (type === "track") {
+    spawnTrainRow(yPos);
   }
 }
 
@@ -287,6 +330,10 @@ function displayPlay() {
         fill("blue");
       }
 
+      else if (r.type === "track"){
+        fill(181, 109, 29);
+      }
+
       noStroke();
       rect(0, screenY, width, gridSize);
     }
@@ -299,6 +346,11 @@ function displayPlay() {
     for (let i = 0; i < logArray.length; i++) {
       logArray[i].update();
       logArray[i].display();
+    }
+
+    for (let i = 0; i < trainArray.length; i++) {
+      trainArray[i].update();
+      trainArray[i].display();
     }
 
     //displays the chicken
@@ -395,6 +447,17 @@ function spawnRiver(yPos) {
   logArray.push(new Log(logX, yPos + 5, speed, logWidth, gridSize - 10));
 }
 
+function spawnTrainRow(yPos) {
+  let speed = trainSpeed;
+  if (random(1) > 0.5) {
+    speed *= -1;
+  }
+  let trainWidth = random(450, 600);
+  let trainX = speed > 0 ? -trainWidth : width + trainWidth;
+
+  trainArray.push(new Train(trainX, yPos + 5, speed, trainWidth, gridSize - 10));
+}
+
 function deleteAndManageInfiteGrid() {
   scrollY = lerp(scrollY, cameraY, 0.01);
 
@@ -404,6 +467,7 @@ function deleteAndManageInfiteGrid() {
       let targetY = rows[i].y;
       carArray = carArray.filter(car => car.y !== targetY + 5);
       logArray = logArray.filter(log => log.y !== targetY + 5);
+      trainArray = trainArray.filter(train => train.y !== targetY + 5);
       rows.splice(i, 1);
     }
   }
@@ -420,7 +484,7 @@ function deleteAndManageInfiteGrid() {
 
   while (highestY + scrollY > -gridSize * 2) {
     highestY -= gridSize;
-    let type = random(["grass", "road", "river", "road"]);
+    let type = random(["grass", "road", "river", "road", "track", "road", "river", "grass"]);
     rows.push({ y: highestY, type: type });
 
     if (type === "road") {
@@ -429,6 +493,10 @@ function deleteAndManageInfiteGrid() {
 
     if (type === "river") {
       spawnRiver(highestY);
+    }
+
+    if (type === "track"){
+      spawnTrainRow(highestY);
     }
   }
 }
