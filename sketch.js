@@ -44,6 +44,11 @@ function preload() {
   chickenLeft = loadImage("chickenL.png");
   chickenRight = loadImage("chickenR.png");
   movementSound = loadSound("movement.mp3");
+  trainPictureR = loadImage("train.png");
+  trainPictureL = loadImage("trainl.png");
+  carPictureL = loadImage("carL.png");
+  carPictureR = loadImage("carR.png");
+  logPicture = loadImage("trunk.png");
 }
 
 //class for the cars that keep on moving and come back
@@ -75,9 +80,13 @@ class Car {
 
   //displays the car after it updates
   display() {
-    fill('red');
-    rectMode(CORNER);
-    rect(this.x, this.y + scrollY, this.w, this.h);
+    imageMode(CORNER);
+    if (this.speed < 0){
+      image(carPictureR, this.x, this.y + scrollY, this.w, this.h);
+    }
+    else{
+      image(carPictureL, this.x, this.y + scrollY, this.w, this.h);
+    }
   }
 }
 
@@ -106,9 +115,8 @@ class Log {
   }
 
   display() {
-    fill('brown');
-    rectMode(CORNER);
-    rect(this.x, this.y + scrollY, this.w, this.h);
+    imageMode(CORNER);
+    image(logPicture, this.x, this.y + scrollY, this.w, this.h);
   }
 
 }
@@ -138,9 +146,15 @@ class Train {
   }
 
   display() {
-    fill('purple');
-    rectMode(CORNER);
-    rect(this.x, this.y + scrollY, this.w, this.h);
+    imageMode(CORNER);
+    if (this.speed > 0){
+      image(trainPictureL, this.x, this.y + scrollY, this.w, this.h);
+    }
+    else{
+      image(trainPictureR, this.x, this.y + scrollY, this.w, this.h);
+    }
+
+
   }
 
 }
