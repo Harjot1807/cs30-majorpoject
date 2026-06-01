@@ -17,20 +17,26 @@ let trainArray = [];
 let cameraY = 0;
 let trainSpeed = 60;
 
-//setting up variables for preloads
+//setting up variables for backgrounds
 let mMenuBg;
 let controlBg;
+
+//setting up variables for the chicken character
 let chicken;
 let chickenFront;
 let chickenBack;
 let chickenLeft;
 let chickenRight;
 let movementSound;
+
+//setting up variables for the obstacles
 let logPicture;
 let carPictureL;
 let carPictureR;
 let trainPictureL;
 let trainPictureR;
+
+//setting up variables for the game logic
 let gridSize = 40;
 let rows = [];
 let scrollY = 0;
@@ -90,8 +96,10 @@ class Car {
   }
 }
 
+//class for the logs that keep on moving and come back
 class Log {
 
+  //gives the log its inital values
   constructor(x, y, speed, w, h) {
     this.x = x;
     this.y = y;
@@ -100,6 +108,7 @@ class Log {
     this.h = h;
   }
 
+  //moves the log x value depending on its speed
   update() {
     this.x += this.speed;
 
@@ -114,6 +123,7 @@ class Log {
     }
   }
 
+  //displays the log after it updates
   display() {
     imageMode(CORNER);
     image(logPicture, this.x, this.y + scrollY, this.w, this.h);
@@ -121,8 +131,10 @@ class Log {
 
 }
 
+//class for the trains that keep on moving and come back
 class Train {
 
+  //gives the train its inital value
   constructor(x, y, speed, w, h) {
     this.x = x;
     this.y = y;
@@ -131,6 +143,7 @@ class Train {
     this.h = h;
   }
 
+  //moves the train x value depending on its speed
   update() {
     this.x += this.speed;
 
@@ -145,6 +158,7 @@ class Train {
     }
   }
 
+  //dispplays the train after it updates
   display() {
     imageMode(CORNER);
     if (this.speed > 0){
@@ -192,6 +206,7 @@ class Player {
     this.x += xDirection * gridSize;
     this.y += yDirection * gridSize;
 
+    //decides if the camera(the display) is going to go up or down
     if (yDirection < 0) {
       cameraY += gridSize;
     }
@@ -199,8 +214,8 @@ class Player {
       cameraY -= gridSize;
     }
 
+    //plays the movement sound
     if (movementSound && typeof movementSound.play === 'function') {
-
       movementSound.play();
     }
   }
@@ -230,12 +245,15 @@ class Player {
   }
 }
 
-//sets up the pllayer character and the cars
+//sets up the player character and the cars
 function setup() {
   createCanvas(windowWidth, windowHeight);
   chicken = new Player();
 
+  //decides the total number of rows based on the height
   let totalRows = Math.ceil(height / gridSize) + 5;
+
+  //generates the initial row 
   for (let i = 0; i < totalRows; i++) {
     let yPos = height - i * gridSize;
     generateInitialRow(yPos);
@@ -261,22 +279,35 @@ function draw() {
   }
 }
 
+//function that makes the first row grass and gives a type for the row
 function generateInitialRow(yPos) {
+
+  //thing that makes it grass for the first one
   let type = "grass";
+
+  //randomly decides if each row should be grass, road, river or track
+  //1/4 - grass
+  //3/8 - road
+  //1/8 - train
+  //1/4 - river
   if (yPos < height - gridSize * 3) {
     type = random(["grass", "road", "road", "river", "grass", "track", "river", "road"]);
   }
 
+  //pushes the row number and type into the golobal row variable
   rows.push({ y: yPos, type: type });
 
+  //if type is a road makes a car row
   if (type === "road") {
     spawnCarRow(yPos);
   }
 
+  //if type is a river makes a log row
   if (type === "river") {
     spawnRiver(yPos);
   }
 
+  //if type is a track makes a river row
   if (type === "track") {
     spawnTrainRow(yPos);
   }
@@ -290,6 +321,8 @@ function displayMainMenu() {
     rectMode(CORNER);
     //loads the image as bg and makes the two boxes
     background(mMenuBg);
+
+    //box and text for the play and control buttons
     fill('white');
     rect(width / 4, height / 4, width / 2, height / 6);
     rect(width / 4, height / 2, width / 2, height / 6);
@@ -312,6 +345,8 @@ function displayControl() {
     rectMode(CORNER);
     fill('white');
     rect(width / 4, height / 4, width / 2, height / 2);
+
+    //for the text
     fill('black');
     textAlign(CENTER);
     textSize((width + height) / 32);
@@ -327,23 +362,34 @@ function displayPlay() {
   //only work if the game is in the play state
   if (state === "play") {
 
-    //displays the background and loads the cars
+    //sets the background
     background('lightgreen');
     deleteAndManageInfiteGrid();
 
+    //sets the rectmode to corner to display properly
     rectMode(CORNER);
+
+    //sorts through all the rows to decide color
     for (let r of rows) {
+
       let screenY = r.y + scrollY;
+
+      //if the row type is grass, color is green
       if (r.type === "grass") {
         fill("lightgreen");
       }
+
+      //if the row type is road, color is darkgray
       else if (r.type === "road") {
         fill("darkgray");
       }
+
+      //if the row type is blue, color is blue
       else if (r.type === "river") {
         fill("blue");
       }
 
+      //if the row type is track, color is lightgray
       else if (r.type === "track"){
         fill(181, 109, 29);
       }
