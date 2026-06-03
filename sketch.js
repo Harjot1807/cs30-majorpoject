@@ -248,16 +248,7 @@ class Player {
 //sets up the player character and the cars
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  chicken = new Player();
-
-  //decides the total number of rows based on the height
-  let totalRows = Math.ceil(height / gridSize) + 5;
-
-  //generates the initial row 
-  for (let i = 0; i < totalRows; i++) {
-    let yPos = height - i * gridSize;
-    generateInitialRow(yPos);
-  }
+  newGame();
 }
 
 //choooses between which state to draw
@@ -276,6 +267,11 @@ function draw() {
   //if state is play
   else if (state === "play") {
     displayPlay();
+    checkCollisions();
+  }
+
+  else if (state === "gameOver") {
+    displayGameOver();
   }
 }
 
@@ -319,6 +315,7 @@ function displayMainMenu() {
   //only works if the state is mainmenu
   if (state === "mainMenu") {
     rectMode(CORNER);
+    imageMode(CORNER);
     //loads the image as bg and makes the two boxes
     background(mMenuBg);
 
@@ -419,6 +416,17 @@ function displayPlay() {
 
 }
 
+function displayGameOver() {
+  fill('red');
+  textAlign(CENTER, CENTER);
+  textSize((width + height) / 15);
+  text("GAME OVER", width / 2, height / 2 - 50);
+
+  fill('white');
+  textSize((width + height) / 40);
+  text("Press ESC to return to Main Menu", width / 2, height / 2 + 50);
+}
+
 //when mouse is pressed
 function mousePressed() {
 
@@ -456,6 +464,11 @@ function keyPressed() {
 
     //returns to menu
     state = "mainMenu";
+  }
+
+  if (keyCode === ESCAPE && state === "gameOver") {
+    state = "mainMenu";
+    newGame(); 
   }
 
   //if in play and w is pressed
@@ -561,3 +574,39 @@ function deleteAndManageInfiteGrid() {
   }
 }
 
+function checkCollisions() {
+  let playerX = chicken.x - (chicken.size / 2);
+  let playerY = (chicken.y + scrollY) - (chicken.size / 2);
+  let playerW = chicken.size;
+  let playerH = chicken.size;
+
+  for (let i = 0; i < carArray.length; i++) {
+    let car = carArray[i];
+    let carX = car.x;
+    let carY = car.y + scrollY;
+    let carW = car.w;
+    let carH = car.h;
+    let hit = collideRectRect(playerX, playerY, playerW, playerH, carX, carY, carW, carH);
+    if (hit) {
+      state = "gameOver";
+      break; 
+    }
+  }
+}
+
+function newGame() {
+  carArray = [];
+  logArray = [];
+  trainArray = [];
+  rows = [];
+  cameraY = 0;
+  scrollY = 0;
+  currentDirection = "front";
+  chicken = new Player();
+
+  let totalRows = Math.ceil(height / gridSize) + 5;
+  for (let i = 0; i < totalRows; i++) {
+    let yPos = height - i * gridSize;
+    generateInitialRow(yPos);
+  }
+}
