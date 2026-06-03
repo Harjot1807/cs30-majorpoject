@@ -87,10 +87,10 @@ class Car {
   //displays the car after it updates
   display() {
     imageMode(CORNER);
-    if (this.speed < 0){
+    if (this.speed < 0) {
       image(carPictureR, this.x, this.y + scrollY, this.w, this.h);
     }
-    else{
+    else {
       image(carPictureL, this.x, this.y + scrollY, this.w, this.h);
     }
   }
@@ -161,10 +161,10 @@ class Train {
   //dispplays the train after it updates
   display() {
     imageMode(CORNER);
-    if (this.speed > 0){
+    if (this.speed > 0) {
       image(trainPictureL, this.x, this.y + scrollY, this.w, this.h);
     }
-    else{
+    else {
       image(trainPictureR, this.x, this.y + scrollY, this.w, this.h);
     }
 
@@ -387,24 +387,28 @@ function displayPlay() {
       }
 
       //if the row type is track, color is lightgray
-      else if (r.type === "track"){
+      else if (r.type === "track") {
         fill(181, 109, 29);
       }
 
+      //makes the individual visiaal row
       noStroke();
       rect(0, screenY, width, gridSize);
     }
 
+    //updates and displays the cars
     for (let i = 0; i < carArray.length; i++) {
       carArray[i].update();
       carArray[i].display();
     }
 
+    //updates and displays the logs
     for (let i = 0; i < logArray.length; i++) {
       logArray[i].update();
       logArray[i].display();
     }
 
+    //updates and displays the trains
     for (let i = 0; i < trainArray.length; i++) {
       trainArray[i].update();
       trainArray[i].display();
@@ -416,12 +420,16 @@ function displayPlay() {
 
 }
 
+//if the game is over (hit log/car/water)
 function displayGameOver() {
+
+  //ddisplays the gme over in red
   fill('red');
   textAlign(CENTER, CENTER);
   textSize((width + height) / 15);
   text("GAME OVER", width / 2, height / 2 - 50);
 
+  //displays the press esc in white
   fill('white');
   textSize((width + height) / 40);
   text("Press ESC to return to Main Menu", width / 2, height / 2 + 50);
@@ -468,7 +476,7 @@ function keyPressed() {
 
   if (keyCode === ESCAPE && state === "gameOver") {
     state = "mainMenu";
-    newGame(); 
+    newGame();
   }
 
   //if in play and w is pressed
@@ -498,18 +506,25 @@ function keyPressed() {
   }
 }
 
+//spawns a car row 
 function spawnCarRow(yPos) {
+
+  //randomizes speed and direction
   let speed = random(2, 5);
   if (random(1) > 0.5) {
     speed *= -1;
   }
+
+  //randomizes the carwidth and pushes the car into its array
   let carWidth = random(60, 90);
   let carX = speed > 0 ? -carWidth : width + carWidth;
-
   carArray.push(new Car(carX, yPos + 5, speed, carWidth, gridSize - 10));
 }
 
+//spawns a log row
 function spawnRiver(yPos) {
+
+  //randomizes speed and direction
   let speed = random(2, 5);
   if (random(1) > 0.5) {
     speed *= -1;
@@ -568,7 +583,7 @@ function deleteAndManageInfiteGrid() {
       spawnRiver(highestY);
     }
 
-    if (type === "track"){
+    if (type === "track") {
       spawnTrainRow(highestY);
     }
   }
@@ -589,7 +604,20 @@ function checkCollisions() {
     let hit = collideRectRect(playerX, playerY, playerW, playerH, carX, carY, carW, carH);
     if (hit) {
       state = "gameOver";
-      break; 
+      break;
+    }
+  }
+
+  for (let j = 0; j < trainArray.length; j++) {
+    let train = trainArray[j];
+    let trainX = train.x;
+    let trainY = train.y + scrollY;
+    let trainW = train.w;
+    let trainH = train.h;
+    let hit = collideRectRect(playerX, playerY, playerW, playerH, trainX, trainY, trainW, trainH);
+    if (hit) {
+      state = "gameOver";
+      break;
     }
   }
 }
