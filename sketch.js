@@ -45,15 +45,15 @@ let scrollY = 0;
 function preload() {
   mMenuBg = loadImage("chicken.jpg");
   controlBg = loadImage("control.webp");
-  chickenFront = loadImage("chickenF.png");
-  chickenBack = loadImage("chickenB.png");
-  chickenLeft = loadImage("chickenL.png");
-  chickenRight = loadImage("chickenR.png");
+  chickenFront = loadImage("chickenFbg.png");
+  chickenBack = loadImage("chickenBbg.png");
+  chickenLeft = loadImage("chickenLbg.png");
+  chickenRight = loadImage("chickenRbg.png");
   movementSound = loadSound("movement.mp3");
   trainPictureR = loadImage("train.png");
   trainPictureL = loadImage("trainl.png");
-  carPictureL = loadImage("carL.png");
-  carPictureR = loadImage("carR.png");
+  carPictureL = loadImage("carLbg.png");
+  carPictureR = loadImage("carRbg.png");
   logPicture = loadImage("trunk.png");
 }
 
@@ -167,10 +167,7 @@ class Train {
     else {
       image(trainPictureR, this.x, this.y + scrollY, this.w, this.h);
     }
-
-
   }
-
 }
 
 //class for the chicken that the player uses
@@ -182,6 +179,7 @@ class Player {
     this.y = height - gridSize * 2 + gridSize / 2;
     this.size = gridSize * 0.8;
     this.direction = currentDirection;
+    this.horizontalSpeed = 0;
   }
 
   //displays the chicken after movement
@@ -218,6 +216,10 @@ class Player {
     if (movementSound && typeof movementSound.play === 'function') {
       movementSound.play();
     }
+
+    if(chicken.horizontalSpeed !== 0){
+      chicken.x += chicken.horizontalSpeed;
+    }
   }
 
   //uses the variable currentdirection of the chicken to choose image to display
@@ -243,6 +245,18 @@ class Player {
       return chickenRight;
     }
   }
+
+  checkCollisionLog(){
+    for (let k = 0; k < logArray.length; k++) {
+      let log = logArray[k];
+      let logX = log.x;
+      let logY = log.y + scrollY;
+      let logW = log.w;
+      let logH = log.h;
+      let logSpeed = log.speed;
+      let onLog = collideRectRect(playerX, playerY, playerW, playerH, logX, logY, logW, logH);
+  }
+}
 }
 
 //sets up the player character and the cars
@@ -590,8 +604,8 @@ function deleteAndManageInfiteGrid() {
 }
 
 function checkCollisions() {
-  let playerX = chicken.x - (chicken.size / 2);
-  let playerY = (chicken.y + scrollY) - (chicken.size / 2);
+  let playerX = chicken.x - chicken.size / 2;
+  let playerY = chicken.y + scrollY - chicken.size / 2;
   let playerW = chicken.size;
   let playerH = chicken.size;
 
@@ -620,6 +634,7 @@ function checkCollisions() {
       break;
     }
   }
+
 }
 
 function newGame() {
