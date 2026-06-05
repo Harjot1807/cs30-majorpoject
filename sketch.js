@@ -184,7 +184,7 @@ class Player {
 
   //displays the chicken after movement
   display() {
-    if(chicken.horizontalSpeed !== 0){
+    if (chicken.horizontalSpeed !== 0) {
       chicken.x += chicken.horizontalSpeed;
     }
     fill('yellow');
@@ -246,7 +246,7 @@ class Player {
     }
   }
 
-  
+
 }
 
 //sets up the player character and the cars
@@ -272,6 +272,7 @@ function draw() {
   else if (state === "play") {
     displayPlay();
     checkCollisions();
+
   }
 
   else if (state === "gameOver") {
@@ -324,6 +325,7 @@ function displayMainMenu() {
     background(mMenuBg);
 
     //box and text for the play and control buttons
+    stroke('black');
     fill('white');
     rect(width / 4, height / 4, width / 2, height / 6);
     rect(width / 4, height / 2, width / 2, height / 6);
@@ -345,7 +347,7 @@ function displayControl() {
     background(controlBg);
     rectMode(CORNER);
     fill('white');
-    rect(width / 4, height / 4, width / 2, height / 2);
+    rect(width / 4, height / 8, width / 2, height*3 / 4);
 
     //for the text
     fill('black');
@@ -526,14 +528,14 @@ function spawnCarRow(yPos) {
   for (let i = 0; i < numCars; i++) {
     let carWidth = random(60, 90);
     let carX;
-      if (speed > 0) {
-        carX = -carWidth - (i * spacing); 
-      } 
-      else {
-        carX = width + carWidth + (i * spacing); 
-      }
+    if (speed > 0) {
+      carX = -carWidth - (i * spacing);
+    }
+    else {
+      carX = width + carWidth + (i * spacing);
+    }
     carArray.push(new Car(carX, yPos + 5, speed, carWidth, gridSize - 10));
-}
+  }
 }
 //spawns a log row
 function spawnRiver(yPos) {
@@ -544,16 +546,16 @@ function spawnRiver(yPos) {
     speed *= -1;
   }
 
-  let numLogs = Math.floor(random(2, 4)); 
+  let numLogs = Math.floor(random(2, 4));
   let spacing = random(280, 490);
 
   for (let i = 0; i < numLogs; i++) {
     let logWidth = random(60, 90);
-    
+
     let logX;
     if (speed > 0) {
       logX = -logWidth - (i * spacing);
-    } 
+    }
     else {
       logX = width + logWidth + (i * spacing);
     }
@@ -586,8 +588,6 @@ function deleteAndManageInfiteGrid() {
       rows.splice(i, 1);
     }
   }
-
-
 
 
   let highestY = height;
@@ -649,21 +649,24 @@ function checkCollisions() {
     }
   }
 
-  chicken.horizontalSpeed = 0; 
+  chicken.horizontalSpeed = 0;
 
-for (let k = 0; k < logArray.length; k++) {
-  let log = logArray[k];
-  let logX = log.x;
-  let logY = log.y + scrollY;
-  let logW = log.w;
-  let logH = log.h;  
-  let onLog = collideRectRect(playerX, playerY, playerW, playerH, logX, logY, logW, logH);
-  
-  if (onLog) {
-    chicken.horizontalSpeed = log.speed; 
-    break; 
-}
-}
+  for (let k = 0; k < logArray.length; k++) {
+    let log = logArray[k];
+    let logX = log.x;
+    let logY = log.y + scrollY;
+    let logW = log.w;
+    let logH = log.h;
+    let onLog = collideRectRect(playerX+20, playerY, playerW-40, playerH, logX, logY, logW, logH);
+
+    if (onLog) {
+      chicken.horizontalSpeed = log.speed;
+      if (chicken.x > width || chicken.x < 0){
+        state = "gameOver";
+      }
+      break;
+    }
+  }
 }
 
 function newGame() {
@@ -682,3 +685,4 @@ function newGame() {
     generateInitialRow(yPos);
   }
 }
+
