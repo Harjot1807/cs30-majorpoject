@@ -184,6 +184,9 @@ class Player {
 
   //displays the chicken after movement
   display() {
+    if(chicken.horizontalSpeed !== 0){
+      chicken.x += chicken.horizontalSpeed;
+    }
     fill('yellow');
     rectMode(CENTER);
 
@@ -217,9 +220,6 @@ class Player {
       movementSound.play();
     }
 
-    if(chicken.horizontalSpeed !== 0){
-      chicken.x += chicken.horizontalSpeed;
-    }
   }
 
   //uses the variable currentdirection of the chicken to choose image to display
@@ -246,17 +246,7 @@ class Player {
     }
   }
 
-  checkCollisionLog(){
-    for (let k = 0; k < logArray.length; k++) {
-      let log = logArray[k];
-      let logX = log.x;
-      let logY = log.y + scrollY;
-      let logW = log.w;
-      let logH = log.h;
-      let logSpeed = log.speed;
-      let onLog = collideRectRect(playerX, playerY, playerW, playerH, logX, logY, logW, logH);
-  }
-}
+  
 }
 
 //sets up the player character and the cars
@@ -529,12 +519,22 @@ function spawnCarRow(yPos) {
     speed *= -1;
   }
 
-  //randomizes the carwidth and pushes the car into its array
-  let carWidth = random(60, 90);
-  let carX = speed > 0 ? -carWidth : width + carWidth;
-  carArray.push(new Car(carX, yPos + 5, speed, carWidth, gridSize - 10));
-}
+  let numCars = Math.floor(random(2, 4))
+  let spacing = random(250, 550);
 
+  //randomizes the carwidth and pushes the car into its array
+  for (let i = 0; i < numCars; i++) {
+    let carWidth = random(60, 90);
+    let carX;
+      if (speed > 0) {
+        carX = -carWidth - (i * spacing); 
+      } 
+      else {
+        carX = width + carWidth + (i * spacing); 
+      }
+    carArray.push(new Car(carX, yPos + 5, speed, carWidth, gridSize - 10));
+}
+}
 //spawns a log row
 function spawnRiver(yPos) {
 
@@ -543,10 +543,23 @@ function spawnRiver(yPos) {
   if (random(1) > 0.5) {
     speed *= -1;
   }
-  let logWidth = random(60, 90);
-  let logX = speed > 0 ? -logWidth : width + logWidth;
 
-  logArray.push(new Log(logX, yPos + 5, speed, logWidth, gridSize - 10));
+  let numLogs = Math.floor(random(2, 4)); 
+  let spacing = random(280, 490);
+
+  for (let i = 0; i < numLogs; i++) {
+    let logWidth = random(60, 90);
+    
+    let logX;
+    if (speed > 0) {
+      logX = -logWidth - (i * spacing);
+    } 
+    else {
+      logX = width + logWidth + (i * spacing);
+    }
+
+    logArray.push(new Log(logX, yPos + 5, speed, logWidth, gridSize - 10));
+  }
 }
 
 function spawnTrainRow(yPos) {
@@ -622,6 +635,7 @@ function checkCollisions() {
     }
   }
 
+
   for (let j = 0; j < trainArray.length; j++) {
     let train = trainArray[j];
     let trainX = train.x;
@@ -635,6 +649,21 @@ function checkCollisions() {
     }
   }
 
+  chicken.horizontalSpeed = 0; 
+
+for (let k = 0; k < logArray.length; k++) {
+  let log = logArray[k];
+  let logX = log.x;
+  let logY = log.y + scrollY;
+  let logW = log.w;
+  let logH = log.h;  
+  let onLog = collideRectRect(playerX, playerY, playerW, playerH, logX, logY, logW, logH);
+  
+  if (onLog) {
+    chicken.horizontalSpeed = log.speed; 
+    break; 
+}
+}
 }
 
 function newGame() {
