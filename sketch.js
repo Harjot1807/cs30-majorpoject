@@ -651,6 +651,8 @@ function checkCollisions() {
 
   chicken.horizontalSpeed = 0;
 
+  let isOnLog = false;
+
   for (let k = 0; k < logArray.length; k++) {
     let log = logArray[k];
     let logX = log.x;
@@ -661,10 +663,23 @@ function checkCollisions() {
 
     if (onLog) {
       chicken.horizontalSpeed = log.speed;
+      isOnLog = true;
       if (chicken.x > width || chicken.x < 0){
         state = "gameOver";
       }
       break;
+    }
+
+    
+  }
+  if (!isOnLog) {
+    for (let r of rows) {
+      if (r.type === "river") {
+        if (chicken.y >= r.y && chicken.y < r.y + gridSize) {
+          state = "gameOver";
+          break;
+        }
+      }
     }
   }
 }
