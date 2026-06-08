@@ -521,19 +521,26 @@ function spawnCarRow(yPos) {
     speed *= -1;
   }
 
-  let numCars = Math.floor(random(2, 4))
+  //randomly decides the number and space between the car
+  let numCars = Math.floor(random(2, 4));
   let spacing = random(250, 550);
 
   //randomizes the carwidth and pushes the car into its array
   for (let i = 0; i < numCars; i++) {
     let carWidth = random(60, 90);
     let carX;
+
+    //spawns the cars if they are moving right
     if (speed > 0) {
       carX = -carWidth - (i * spacing);
     }
+
+    //spawns the cars if they are moving left
     else {
       carX = width + carWidth + (i * spacing);
     }
+
+    //pushes the car into its car array with its values;
     carArray.push(new Car(carX, yPos + 5, speed, carWidth, gridSize - 10));
   }
 }
@@ -546,23 +553,30 @@ function spawnRiver(yPos) {
     speed *= -1;
   }
 
+  //randomly decides if there are 2 or 3 cars
   let numLogs = Math.floor(random(2, 4));
   let spacing = random(280, 490);
 
+  //spawns the random number of cars
   for (let i = 0; i < numLogs; i++) {
     let logWidth = random(60, 90);
 
     let logX;
+    //spawns the cars if they are moving right
     if (speed > 0) {
       logX = -logWidth - (i * spacing);
     }
+
+    //spawns the car if they are moving left
     else {
       logX = width + logWidth + (i * spacing);
     }
 
+    //adds the cars into the car array with its values
     logArray.push(new Log(logX, yPos + 5, speed, logWidth, gridSize - 10));
   }
 }
+
 
 function spawnTrainRow(yPos) {
   let speed = trainSpeed;
@@ -659,7 +673,7 @@ function checkCollisions() {
     let logY = log.y + scrollY;
     let logW = log.w;
     let logH = log.h;
-    let onLog = collideRectRect(playerX+20, playerY, playerW-40, playerH, logX, logY, logW, logH);
+    let onLog = collideRectRect(playerX+10, playerY, playerW-20, playerH, logX, logY, logW, logH);
 
     if (onLog) {
       chicken.horizontalSpeed = log.speed;
