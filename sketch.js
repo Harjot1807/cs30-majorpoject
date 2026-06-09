@@ -553,26 +553,26 @@ function spawnRiver(yPos) {
     speed *= -1;
   }
 
-  //randomly decides if there are 2 or 3 cars
+  //randomly decides if there are 2 or 3 logs
   let numLogs = Math.floor(random(2, 4));
   let spacing = random(280, 490);
 
-  //spawns the random number of cars
+  //spawns the random number of logd
   for (let i = 0; i < numLogs; i++) {
-    let logWidth = random(60, 90);
+    let logWidth = random(90, 130);
 
     let logX;
-    //spawns the cars if they are moving right
+    //spawns the logs if they are moving right
     if (speed > 0) {
       logX = -logWidth - (i * spacing);
     }
 
-    //spawns the car if they are moving left
+    //spawns the logs if they are moving left
     else {
       logX = width + logWidth + (i * spacing);
     }
 
-    //adds the cars into the car array with its values
+    //adds the logs into the log array with its values
     logArray.push(new Log(logX, yPos + 5, speed, logWidth, gridSize - 10));
   }
 }
@@ -590,19 +590,19 @@ function spawnTrainRow(yPos) {
 }
 
 function deleteAndManageInfiteGrid() {
-  scrollY = lerp(scrollY, cameraY, 0.01);
+  scrollY = lerp(scrollY, cameraY, 0.05);
 
   for (let i = rows.length - 1; i >= 0; i--) {
     let screenY = rows[i].y + scrollY;
-    if (screenY > height + gridSize) {
+    if (screenY > height + gridSize *2) {
       let targetY = rows[i].y;
-      carArray = carArray.filter(car => car.y !== targetY + 5);
-      logArray = logArray.filter(log => log.y !== targetY + 5);
-      trainArray = trainArray.filter(train => train.y !== targetY + 5);
       rows.splice(i, 1);
     }
   }
-
+  
+  carArray = carArray.filter(car => (car.y + scrollY) < height + gridSize*2);
+  logArray = logArray.filter(log => (log.y + scrollY) < height + gridSize*2);
+  trainArray = trainArray.filter(train => (train.y + scrollY) < height + gridSize*2);
 
   let highestY = height;
   for (let r of rows) {
