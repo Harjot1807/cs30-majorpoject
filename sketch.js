@@ -340,13 +340,13 @@ function generateInitialRow(yPos) {
   }
 
   //pushes the row number and type into the golobal row variable
-  let newRow = ({ y: yPos, type: type });
+  let newRow = { y: yPos, type: type };
 
   if (type === "fastTrack") {
-    newRow.trackState = "waiting"; 
-    newRow.timer = Math.floor(random(240, 360)); 
+    newRow.trackState = "waiting";
+    newRow.timer = Math.floor(random(240, 360));
     if (random(1) > 0.5) {
-    newRow.speedDirection = 1;
+      newRow.speedDirection = 1;
     }
     else {
       newRow.speedDirection = -1;
@@ -404,7 +404,7 @@ function displayControl() {
     background(controlBg);
     rectMode(CORNER);
     fill('white');
-    rect(width / 4, height / 8, width / 2, height*3 / 4);
+    rect(width / 4, height / 8, width / 2, height * 3 / 4);
 
     //for the text
     fill('black');
@@ -415,23 +415,23 @@ function displayControl() {
   }
 }
 
-function manageFastTracks(){
-  for (let r of rows){
-    if (r.type === "fastTrack"){
+function manageFastTracks() {
+  for (let r of rows) {
+    if (r.type === "fastTrack") {
       r.timer--;
       let screenY = r.y + scrollY;
-      if (r.trackState === "waiting" && r.timer <= 0){
+      if (r.trackState === "waiting" && r.timer <= 0) {
         r.trackState = "warning";
         r.timer = 60;
       }
 
-      else if (r.trackState === "warning"){
-        if (frameCount % 20 <10){
+      else if (r.trackState === "warning") {
+        if (frameCount % 20 < 10) {
           fill(255, 0, 0, 160);
           rect(0, screenY, width, gridSize);
         }
 
-        if (r.timer <= 0){
+        if (r.timer <= 0) {
           r.trackState = "waiting";
           r.timer = Math.floor(random(240, 360));
           let speed = fastTrainSpeed;
@@ -443,12 +443,12 @@ function manageFastTracks(){
           let trainX;
           if (speed > 0) {
             trainX = -trainW;
-          } 
+          }
           else {
             trainX = width + trainW;
           }
 
-          fastTrainArray.push(new FastTrain(trainX, r.y +5, speed, trainW, gridSize - 10));
+          fastTrainArray.push(new FastTrain(trainX, r.y + 5, speed, trainW, gridSize - 10));
         }
       }
     }
@@ -495,8 +495,8 @@ function displayPlay() {
       }
 
       //if the row type is fastrack color is dark brown
-      else if (r.type === "fastTrack"){
-        fill(150, 70, 20)
+      else if (r.type === "fastTrack") {
+        fill(150, 70, 20);
       }
 
       //makes the individual visiaal row
@@ -641,12 +641,12 @@ function spawnCarRow(yPos) {
 
     //spawns the cars if they are moving right
     if (speed > 0) {
-      carX = -carWidth - (i * spacing);
+      carX = -carWidth - i * spacing;
     }
 
     //spawns the cars if they are moving left
     else {
-      carX = width + carWidth + (i * spacing);
+      carX = width + carWidth + i * spacing;
     }
 
     //pushes the car into its car array with its values;
@@ -673,12 +673,12 @@ function spawnRiver(yPos) {
     let logX;
     //spawns the logs if they are moving right
     if (speed > 0) {
-      logX = -logWidth - (i * spacing);
+      logX = -logWidth - i * spacing;
     }
 
     //spawns the logs if they are moving left
     else {
-      logX = width + logWidth + (i * spacing);
+      logX = width + logWidth + i * spacing;
     }
 
     //adds the logs into the log array with its values
@@ -703,16 +703,16 @@ function deleteAndManageInfiteGrid() {
 
   for (let i = rows.length - 1; i >= 0; i--) {
     let screenY = rows[i].y + scrollY;
-    if (screenY > height + gridSize *2) {
+    if (screenY > height + gridSize * 2) {
       let targetY = rows[i].y;
       rows.splice(i, 1);
     }
   }
-  
-  carArray = carArray.filter(car => (car.y + scrollY) < height + gridSize*2);
-  logArray = logArray.filter(log => (log.y + scrollY) < height + gridSize*2);
-  trainArray = trainArray.filter(train => (train.y + scrollY) < height + gridSize*2);
-  fastTrainArray = fastTrainArray.filter(train => (train.y + scrollY) < height + gridSize*2 && !train.offScreen);
+
+  carArray = carArray.filter(car => car.y + scrollY < height + gridSize * 2);
+  logArray = logArray.filter(log => log.y + scrollY < height + gridSize * 2);
+  trainArray = trainArray.filter(train => train.y + scrollY < height + gridSize * 2);
+  fastTrainArray = fastTrainArray.filter(train => train.y + scrollY < height + gridSize * 2 && !train.offScreen);
 
   let highestY = height;
   for (let r of rows) {
@@ -726,16 +726,16 @@ function deleteAndManageInfiteGrid() {
     let type = random(["grass", "fastTrack", "road", "river", "road", "track", "road", "river", "grass"]);
     let newRow = { y: highestY, type: type };
 
-    if (type === "fastTrack"){
-      newRow.trackState = "waiting"; 
-      newRow.timer = Math.floor(random(240, 360)); 
+    if (type === "fastTrack") {
+      newRow.trackState = "waiting";
+      newRow.timer = Math.floor(random(240, 360));
       if (random(1) > 0.5) {
-      newRow.speedDirection = 1;
+        newRow.speedDirection = 1;
       }
       else {
         newRow.speedDirection = -1;
       }
-    } 
+    }
 
     rows.push(newRow);
 
@@ -786,7 +786,7 @@ function checkCollisions() {
     }
   }
 
-  
+
   for (let j = 0; j < fastTrainArray.length; j++) {
     let fTrain = fastTrainArray[j];
     let fTrainX = fTrain.x;
@@ -810,18 +810,18 @@ function checkCollisions() {
     let logY = log.y + scrollY;
     let logW = log.w;
     let logH = log.h;
-    let onLog = collideRectRect(playerX+10, playerY, playerW-20, playerH, logX, logY, logW, logH);
+    let onLog = collideRectRect(playerX + 10, playerY, playerW - 20, playerH, logX, logY, logW, logH);
 
     if (onLog) {
       chicken.horizontalSpeed = log.speed;
       isOnLog = true;
-      if (chicken.x > width || chicken.x < 0){
+      if (chicken.x > width || chicken.x < 0) {
         gameOver();
       }
       break;
     }
 
-    
+
   }
   if (!isOnLog) {
     for (let r of rows) {
@@ -837,7 +837,7 @@ function checkCollisions() {
 
 function newGame() {
 
-  if (deathMusic && deathMusic.isPlaying()){
+  if (deathMusic && deathMusic.isPlaying()) {
     deathMusic.stop();
   }
 
@@ -858,9 +858,9 @@ function newGame() {
   }
 }
 
-function gameOver(){
+function gameOver() {
   state = "gameOver";
-  if (deathMusic && typeof deathMusic.play === 'function'){
+  if (deathMusic && typeof deathMusic.play === 'function') {
     deathMusic.play();
   }
 }
