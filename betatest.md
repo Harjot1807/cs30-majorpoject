@@ -10,4 +10,9 @@
 - Add texture to signify its water, grass, track, road
 - Play again option
 
+# My brother in Grade 8
 
+- Audio Crash on spamming 
+- Add arrow keys
+- Add Play again
+- Trains come repeat too slow (the ones with the warning)
