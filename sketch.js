@@ -14,8 +14,10 @@ let currentDirection = "front";
 let carArray = [];
 let logArray = [];
 let trainArray = [];
+let fastTrainArray = [];
 let cameraY = 0;
-let trainSpeed = 60;
+let trainSpeed = 30;
+let fastTrainSpeed = 90;
 
 //setting up variables for backgrounds
 let mMenuBg;
@@ -170,6 +172,45 @@ class Train {
   }
 }
 
+class FastTrain {
+
+  //gives the train its inital value
+  constructor(x, y, speed, w, h) {
+    this.x = x;
+    this.y = y;
+    this.speed = speed;
+    this.w = w;
+    this.h = h;
+    this.offScreen = false;
+  }
+
+  //moves the train x value depending on its speed
+  update() {
+    this.x += this.speed;
+
+    //if the train goes out of the right side
+    if (this.speed > 0 && this.x > width + this.w) {
+      this.offScreen = true;;
+    }
+
+    //if the train goes out of the left side
+    if (this.speed < 0 && this.x < 0 - this.w) {
+      this.offScreen = true;
+    }
+  }
+
+  //dispplays the train after it updates
+  display() {
+    imageMode(CORNER);
+    if (this.speed > 0) {
+      image(trainPictureL, this.x, this.y + scrollY, this.w, this.h);
+    }
+    else {
+      image(trainPictureR, this.x, this.y + scrollY, this.w, this.h);
+    }
+  }
+}
+
 //class for the chicken that the player uses
 class Player {
 
@@ -249,6 +290,7 @@ class Player {
 
 }
 
+
 //sets up the player character and the cars
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -292,11 +334,24 @@ function generateInitialRow(yPos) {
   //1/8 - train
   //1/4 - river
   if (yPos < height - gridSize * 3) {
-    type = random(["grass", "road", "road", "river", "grass", "track", "river", "road"]);
+    type = random(["grass", "fastTrack", "road", "road", "river", "grass", "track", "river", "road"]);
   }
 
   //pushes the row number and type into the golobal row variable
-  rows.push({ y: yPos, type: type });
+  let newRow = ({ y: yPos, type: type });
+
+  if (type === "fastTrack") {
+    newRow.trackState = "waiting"; 
+    newRow.timer = Math.floor(random(240, 360)); 
+    if (random(1) > 0.5) {
+    newRow.speedDirection = 1;
+    }
+    else {
+      newRow.speedDirection = -1;
+    }
+  }
+
+  rows.push(newRow);
 
   //if type is a road makes a car row
   if (type === "road") {
@@ -358,6 +413,46 @@ function displayControl() {
   }
 }
 
+function manageFastTracks(){
+  for (let r of rows){
+    if (r.type === "fastTrack"){
+      r.timer--;
+      let screenY = r.y + scrollY;
+      if (r.trackState === "waiting" && r.timer <= 0){
+        r.trackState = "warning";
+        r.timer = 60;
+      }
+
+      else if (r.trackState === "warning"){
+        if (frameCount % 20 <10){
+          fill(255, 0, 0, 160);
+          rect(0, screenY, width, gridSize);
+        }
+
+        if (r.timer <= 0){
+          r.trackState = "waiting";
+          r.timer = Math.floor(random(240, 360));
+          let speed = fastTrainSpeed;
+          if (r.speedDirection < 0) {
+            speed *= -1;
+          }
+
+          let trainW = random(450, 600);
+          let trainX;
+          if (speed > 0) {
+            trainX = -trainW;
+          } 
+          else {
+            trainX = width + trainW;
+          }
+
+          fastTrainArray.push(new FastTrain(trainX, r.y +5, speed, trainW, gridSize - 10));
+        }
+      }
+    }
+  }
+}
+
 
 //functions that actually lets the gameplay
 function displayPlay() {
@@ -397,10 +492,17 @@ function displayPlay() {
         fill(181, 109, 29);
       }
 
+      //if the row type is fastrack color is dark brown
+      else if (r.type === "fastTrack"){
+        fill(150, 70, 20)
+      }
+
       //makes the individual visiaal row
       noStroke();
       rect(0, screenY, width, gridSize);
     }
+
+    manageFastTracks();
 
     //updates and displays the cars
     for (let i = 0; i < carArray.length; i++) {
@@ -418,6 +520,11 @@ function displayPlay() {
     for (let i = 0; i < trainArray.length; i++) {
       trainArray[i].update();
       trainArray[i].display();
+    }
+
+    for (let i = 0; i < fastTrainArray.length; i++) {
+      fastTrainArray[i].update();
+      fastTrainArray[i].display();
     }
 
     //displays the chicken
@@ -603,6 +710,7 @@ function deleteAndManageInfiteGrid() {
   carArray = carArray.filter(car => (car.y + scrollY) < height + gridSize*2);
   logArray = logArray.filter(log => (log.y + scrollY) < height + gridSize*2);
   trainArray = trainArray.filter(train => (train.y + scrollY) < height + gridSize*2);
+  fastTrainArray = fastTrainArray.filter(train => (train.y + scrollY) < height + gridSize*2 && !train.offScreen);
 
   let highestY = height;
   for (let r of rows) {
@@ -613,8 +721,21 @@ function deleteAndManageInfiteGrid() {
 
   while (highestY + scrollY > -gridSize * 2) {
     highestY -= gridSize;
-    let type = random(["grass", "road", "river", "road", "track", "road", "river", "grass"]);
-    rows.push({ y: highestY, type: type });
+    let type = random(["grass", "fastTrack", "road", "river", "road", "track", "road", "river", "grass"]);
+    let newRow = { y: highestY, type: type };
+
+    if (type === "fastTrack"){
+      newRow.trackState = "waiting"; 
+      newRow.timer = Math.floor(random(240, 360)); 
+      if (random(1) > 0.5) {
+      newRow.speedDirection = 1;
+      }
+      else {
+        newRow.speedDirection = -1;
+      }
+    } 
+
+    rows.push(newRow);
 
     if (type === "road") {
       spawnCarRow(highestY);
@@ -663,6 +784,20 @@ function checkCollisions() {
     }
   }
 
+  
+  for (let j = 0; j < fastTrainArray.length; j++) {
+    let fTrain = fastTrainArray[j];
+    let fTrainX = fTrain.x;
+    let fTrainY = fTrain.y + scrollY;
+    let fTrainW = fTrain.w;
+    let fTrainH = fTrain.h;
+    let hit = collideRectRect(playerX, playerY, playerW, playerH, fTrainX, fTrainY, fTrainW, fTrainH);
+    if (hit) {
+      state = "gameOver";
+      break;
+    }
+  }
+
   chicken.horizontalSpeed = 0;
 
   let isOnLog = false;
@@ -702,6 +837,7 @@ function newGame() {
   carArray = [];
   logArray = [];
   trainArray = [];
+  fastTrainArray = [];
   rows = [];
   cameraY = 0;
   scrollY = 0;
