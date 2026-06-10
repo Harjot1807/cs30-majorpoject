@@ -30,6 +30,7 @@ let chickenBack;
 let chickenLeft;
 let chickenRight;
 let movementSound;
+let deathMusic;
 
 //setting up variables for the obstacles
 let logPicture;
@@ -52,6 +53,7 @@ function preload() {
   chickenLeft = loadImage("chickenLbg.png");
   chickenRight = loadImage("chickenRbg.png");
   movementSound = loadSound("movement.mp3");
+  deathMusic = loadSound("death.mp3")
   trainPictureR = loadImage("train.png");
   trainPictureL = loadImage("trainl.png");
   carPictureL = loadImage("carLbg.png");
@@ -765,7 +767,7 @@ function checkCollisions() {
     let carH = car.h;
     let hit = collideRectRect(playerX, playerY, playerW, playerH, carX, carY, carW, carH);
     if (hit) {
-      state = "gameOver";
+      gameOver();
       break;
     }
   }
@@ -779,7 +781,7 @@ function checkCollisions() {
     let trainH = train.h;
     let hit = collideRectRect(playerX, playerY, playerW, playerH, trainX, trainY, trainW, trainH);
     if (hit) {
-      state = "gameOver";
+      gameOver();
       break;
     }
   }
@@ -793,7 +795,7 @@ function checkCollisions() {
     let fTrainH = fTrain.h;
     let hit = collideRectRect(playerX, playerY, playerW, playerH, fTrainX, fTrainY, fTrainW, fTrainH);
     if (hit) {
-      state = "gameOver";
+      gameOver();
       break;
     }
   }
@@ -814,7 +816,7 @@ function checkCollisions() {
       chicken.horizontalSpeed = log.speed;
       isOnLog = true;
       if (chicken.x > width || chicken.x < 0){
-        state = "gameOver";
+        gameOver();
       }
       break;
     }
@@ -825,7 +827,7 @@ function checkCollisions() {
     for (let r of rows) {
       if (r.type === "river") {
         if (chicken.y >= r.y && chicken.y < r.y + gridSize) {
-          state = "gameOver";
+          gameOver();
           break;
         }
       }
@@ -834,6 +836,11 @@ function checkCollisions() {
 }
 
 function newGame() {
+
+  if (deathMusic && deathMusic.isPlaying()){
+    deathMusic.stop();
+  }
+
   carArray = [];
   logArray = [];
   trainArray = [];
@@ -848,6 +855,13 @@ function newGame() {
   for (let i = 0; i < totalRows; i++) {
     let yPos = height - i * gridSize;
     generateInitialRow(yPos);
+  }
+}
+
+function gameOver(){
+  state = "gameOver";
+  if (deathMusic && typeof deathMusic.play === 'function'){
+    deathMusic.play();
   }
 }
 
