@@ -53,7 +53,7 @@ function preload() {
   chickenLeft = loadImage("chickenLbg.png");
   chickenRight = loadImage("chickenRbg.png");
   movementSound = loadSound("movement.mp3");
-  deathMusic = loadSound("death.mp3")
+  deathMusic = loadSound("death.mp3");
   trainPictureR = loadImage("train.png");
   trainPictureL = loadImage("trainl.png");
   carPictureL = loadImage("carLbg.png");
