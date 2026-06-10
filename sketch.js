@@ -593,27 +593,27 @@ function keyPressed() {
   }
 
   //if in play and w is pressed
-  else if (state === "play" && key === "w") {
+  else if (state === "play" && (key === "w" || keyCode === UP_ARROW)) {
 
     //changes direction to front to replace the image and moves the chicken
     currentDirection = "front";
     chicken.move(0, -1);
   }
 
-  //changes direction to front to replace the image and moves the chicken
-  else if (state === "play" && key === "s") {
+  //changes direction to back to replace the image and moves the chicken
+  else if (state === "play" && (key === "s" || keyCode === DOWN_ARROW)) {
     currentDirection = "back";
     chicken.move(0, 1);
   }
 
-  //changes direction to front to replace the image and moves the chicken
-  else if (state === "play" && key === "a") {
+  //changes direction to left to replace the image and moves the chicken
+  else if (state === "play" && (key === "a" || keyCode === LEFT_ARROW)) {
     currentDirection = "left";
     chicken.move(-1, 0);
   }
 
-  //changes direction to front to replace the image and moves the chicken
-  else if (state === "play" && key === "d") {
+  //changes direction to right to replace the image and moves the chicken
+  else if (state === "play" && (key === "d" || keyCode === RIGHT_ARROW)) {
     currentDirection = "right";
     chicken.move(1, 0);
   }
