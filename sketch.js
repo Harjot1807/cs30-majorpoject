@@ -18,6 +18,9 @@ let fastTrainArray = [];
 let cameraY = 0;
 let trainSpeed = 30;
 let fastTrainSpeed = 90;
+let autoSpeed = 0.5;
+let highestRowReached = 0;   
+let progressTimer = 0;
 
 //setting up variables for backgrounds
 let mMenuBg;
@@ -223,6 +226,7 @@ class Player {
     this.size = gridSize * 0.8;
     this.direction = currentDirection;
     this.horizontalSpeed = 0;
+    this.initialY = this.y;
   }
 
   //displays the chicken after movement
@@ -230,10 +234,19 @@ class Player {
     if (chicken.horizontalSpeed !== 0) {
       chicken.x += chicken.horizontalSpeed;
     }
+
+    let screenY = this.y + scrollY;
+    let bottomLimit = height - this.size / 2;
+
+    if (screenY > bottomLimit) {
+      this.y -= gridSize; 
+      screenY = bottomLimit;
+    }
+
     fill('yellow');
     rectMode(CENTER);
 
-    let screenY = this.y + scrollY;
+    
     rect(this.x, screenY, this.size, this.size);
     imageMode(CENTER);
 
@@ -699,6 +712,22 @@ function spawnTrainRow(yPos) {
 }
 
 function deleteAndManageInfiteGrid() {
+  let currentChickenRow = Math.round((chicken.initialY - chicken.y) / gridSize);
+
+  if (currentChickenRow > highestRowReached) {
+    highestRowReached = currentChickenRow;
+    progressTimer = 0; 
+  } 
+  else {
+    progressTimer++; 
+  }
+
+  if (progressTimer >= 180) {
+    cameraY += gridSize;      
+    highestRowReached++;      
+    progressTimer = 0;        
+  }
+
   scrollY = lerp(scrollY, cameraY, 0.05);
 
   for (let i = rows.length - 1; i >= 0; i--) {
@@ -848,6 +877,8 @@ function newGame() {
   rows = [];
   cameraY = 0;
   scrollY = 0;
+  highestRowReached = 0;
+  progressTimer = 0;
   currentDirection = "front";
   chicken = new Player();
 
