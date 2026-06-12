@@ -236,11 +236,11 @@ class Player {
     }
 
     let screenY = this.y + scrollY;
-    let bottomLimit = height - this.size / 2;
+    let bottomLimit = height - gridSize / 2;
 
     if (screenY > bottomLimit) {
       this.y -= gridSize; 
-      screenY = bottomLimit;
+      screenY = this.y + scrollY;
     }
 
     fill('yellow');
@@ -266,9 +266,6 @@ class Player {
     //decides if the camera(the display) is going to go up or down
     if (yDirection < 0) {
       cameraY += gridSize;
-    }
-    else if (yDirection > 0 && cameraY > 0) {
-      cameraY -= gridSize;
     }
 
     //plays the movement sound
@@ -722,7 +719,7 @@ function deleteAndManageInfiteGrid() {
     progressTimer++; 
   }
 
-  if (progressTimer >= 180) {
+  if (progressTimer >= 360) {
     cameraY += gridSize;      
     highestRowReached++;      
     progressTimer = 0;        
