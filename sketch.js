@@ -198,7 +198,7 @@ class FastTrain {
 
     //if the train goes out of the right side
     if (this.speed > 0 && this.x > width + this.w) {
-      this.offScreen = true;;
+      this.offScreen = true;
     }
 
     //if the train goes out of the left side
@@ -275,7 +275,10 @@ class Player {
     }
 
     //plays the movement sound
-    if (movementSound && typeof movementSound.play === 'function') {
+    if (movementSound && typeof movementSound.play === 'function'){
+      if (movementSound.isPlaying()) {
+        movementSound.stop();
+      }
       movementSound.play();
     }
 
@@ -631,7 +634,7 @@ function keyPressed() {
 
 
   //to restart the game
-  else if (state === "gameOver" && key === 'r'){
+  else if (state === "gameOver" && key === 'r') {
     state = "play";
     newGame();
   }
@@ -950,9 +953,11 @@ function newGame() {
 
 //when game is over plays the death sound
 function gameOver() {
-  state = "gameOver";
-  if (deathMusic && typeof deathMusic.play === 'function') {
-    deathMusic.play();
+  if (state !== "gameOver"){
+    state = "gameOver";
+    if (deathMusic && typeof deathMusic.play === 'function') {
+      deathMusic.play();
+    }
   }
 }
 
