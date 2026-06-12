@@ -238,18 +238,19 @@ class Player {
       chicken.x += chicken.horizontalSpeed;
     }
 
+    //variables for the screen to push up the chicken
     let screenY = this.y + scrollY;
     let bottomLimit = height - gridSize / 2;
 
+    //pushes the chicken up
     if (screenY > bottomLimit) {
       this.y -= gridSize; 
       screenY = this.y + scrollY;
     }
 
+    //displays the chicken
     fill('yellow');
     rectMode(CENTER);
-
-    
     rect(this.x, screenY, this.size, this.size);
     imageMode(CENTER);
 
@@ -334,6 +335,7 @@ function draw() {
 
   }
 
+  //if the game is over, grayscale filter
   else if (state === "gameOver") {
     displayPlay();
     filter(GRAY);
@@ -348,10 +350,11 @@ function generateInitialRow(yPos) {
   let type = "grass";
 
   //randomly decides if each row should be grass, road, river or track
-  //1/4 - grass
-  //3/8 - road
-  //1/8 - train
-  //1/4 - river
+  //2/9 - grass
+  //1/3 - road
+  //1/9 - train
+  //2/9 - river
+  //1/9 fastTrain
   if (yPos < height - gridSize * 3) {
     type = random(["grass", "fastTrack", "road", "road", "river", "grass", "track", "river", "road"]);
   }
@@ -359,8 +362,11 @@ function generateInitialRow(yPos) {
   //pushes the row number and type into the golobal row variable
   let newRow = { y: yPos, type: type };
 
+  //if type is fastrack
   if (type === "fastTrack") {
     newRow.trackState = "waiting";
+
+    //randomly decides a wait time between 240 and 360 frames and directin
     newRow.timer = Math.floor(random(240, 360));
     if (random(1) > 0.5) {
       newRow.speedDirection = 1;
@@ -370,6 +376,7 @@ function generateInitialRow(yPos) {
     }
   }
 
+  //pushes it into the row
   rows.push(newRow);
 
   //if type is a road makes a car row
@@ -432,22 +439,29 @@ function displayControl() {
   }
 }
 
+//manages the trains inside the waiting trains
 function manageFastTracks() {
+
+  //goes through every train on the screen
   for (let r of rows) {
     if (r.type === "fastTrack") {
       r.timer--;
+
+      //gets the train in 60 frames after the warning
       let screenY = r.y + scrollY;
       if (r.trackState === "waiting" && r.timer <= 0) {
         r.trackState = "warning";
         r.timer = 60;
       }
 
+      //displays the red flashing
       else if (r.trackState === "warning") {
         if (frameCount % 20 < 10) {
           fill(255, 0, 0, 160);
           rect(0, screenY, width, gridSize);
         }
 
+        //after the train is gone resets the wait
         if (r.timer <= 0) {
           r.trackState = "waiting";
           r.timer = Math.floor(random(240, 360));
@@ -456,6 +470,7 @@ function manageFastTracks() {
             speed *= -1;
           }
 
+          //ramdomly decides the trains width and keeps it moving
           let trainW = random(450, 600);
           let trainX;
           if (speed > 0) {
@@ -465,6 +480,7 @@ function manageFastTracks() {
             trainX = width + trainW;
           }
 
+          //pushes the train into the array
           fastTrainArray.push(new FastTrain(trainX, r.y + 5, speed, trainW, gridSize - 10));
         }
       }
@@ -541,6 +557,7 @@ function displayPlay() {
       trainArray[i].display();
     }
 
+    //updates and displays the fastTrains
     for (let i = 0; i < fastTrainArray.length; i++) {
       fastTrainArray[i].update();
       fastTrainArray[i].display();
@@ -606,11 +623,14 @@ function keyPressed() {
     state = "mainMenu";
   }
 
+  //if escape is pressed while the game is over
   if (keyCode === ESCAPE && state === "gameOver") {
     state = "mainMenu";
     newGame();
   }
 
+
+  //to restart the game
   else if (state === "gameOver" && key === 'r'){
     state = "play";
     newGame();
@@ -708,21 +728,24 @@ function spawnRiver(yPos) {
   }
 }
 
-
+//spawns in trains if the row is a track
 function spawnTrainRow(yPos) {
   let speed = trainSpeed;
+
+  //decides width, direction and pushes train into the array
   if (random(1) > 0.5) {
     speed *= -1;
   }
   let trainWidth = random(450, 600);
   let trainX = speed > 0 ? -trainWidth : width + trainWidth;
-
   trainArray.push(new Train(trainX, yPos + 5, speed, trainWidth, gridSize - 10));
 }
 
+//function that omptimizes the entire game
 function deleteAndManageInfiteGrid() {
   let currentChickenRow = Math.round((chicken.initialY - chicken.y) / gridSize);
 
+  //sees the highest row displayed and changes the progress time
   if (currentChickenRow > highestRowReached) {
     highestRowReached = currentChickenRow;
     progressTimer = 0; 
@@ -731,14 +754,17 @@ function deleteAndManageInfiteGrid() {
     progressTimer++; 
   }
 
+  //if the chicken hasnt moven in 360 frames screen pushes up the chicken
   if (progressTimer >= 360) {
     cameraY += gridSize;      
     highestRowReached++;      
     progressTimer = 0;        
   }
 
+  //smoothly moves the screen up
   scrollY = lerp(scrollY, cameraY, 0.05);
 
+  //if the row is outside the screen deltes it
   for (let i = rows.length - 1; i >= 0; i--) {
     let screenY = rows[i].y + scrollY;
     if (screenY > height + gridSize * 2) {
@@ -747,11 +773,13 @@ function deleteAndManageInfiteGrid() {
     }
   }
 
+  //filters all the objects that are outside the screen
   carArray = carArray.filter(car => car.y + scrollY < height + gridSize * 2);
   logArray = logArray.filter(log => log.y + scrollY < height + gridSize * 2);
   trainArray = trainArray.filter(train => train.y + scrollY < height + gridSize * 2);
   fastTrainArray = fastTrainArray.filter(train => train.y + scrollY < height + gridSize * 2 && !train.offScreen);
 
+  //as the chicken moves up and a new row spawns
   let highestY = height;
   for (let r of rows) {
     if (r.y < highestY) {
@@ -759,11 +787,13 @@ function deleteAndManageInfiteGrid() {
     }
   }
 
+  //randomly decides which row to put
   while (highestY + scrollY > -gridSize * 2) {
     highestY -= gridSize;
     let type = random(["grass", "fastTrack", "road", "river", "road", "track", "road", "river", "grass"]);
     let newRow = { y: highestY, type: type };
 
+    //if the row is fasttrack, pushes a fastTrain row
     if (type === "fastTrack") {
       newRow.trackState = "waiting";
       newRow.timer = Math.floor(random(240, 360));
@@ -775,28 +805,33 @@ function deleteAndManageInfiteGrid() {
       }
     }
 
+    //pushes the random row in
     rows.push(newRow);
 
+
+    //spawns the corresponding objects
     if (type === "road") {
       spawnCarRow(highestY);
     }
-
     if (type === "river") {
       spawnRiver(highestY);
     }
-
     if (type === "track") {
       spawnTrainRow(highestY);
     }
   }
 }
 
+//functions that see crucial collisions
 function checkCollisions() {
+
+  //gets the chicken coordinates
   let playerX = chicken.x - chicken.size / 2;
   let playerY = chicken.y + scrollY - chicken.size / 2;
   let playerW = chicken.size;
   let playerH = chicken.size;
 
+  //sees collisions with cars and chicken
   for (let i = 0; i < carArray.length; i++) {
     let car = carArray[i];
     let carX = car.x;
@@ -804,13 +839,15 @@ function checkCollisions() {
     let carW = car.w;
     let carH = car.h;
     let hit = collideRectRect(playerX, playerY, playerW, playerH, carX, carY, carW, carH);
+
+    //game over if there is a collision
     if (hit) {
       gameOver();
       break;
     }
   }
 
-
+  //sees collisions with trains and chicken
   for (let j = 0; j < trainArray.length; j++) {
     let train = trainArray[j];
     let trainX = train.x;
@@ -818,13 +855,15 @@ function checkCollisions() {
     let trainW = train.w;
     let trainH = train.h;
     let hit = collideRectRect(playerX, playerY, playerW, playerH, trainX, trainY, trainW, trainH);
+
+    //game over if thre is a collision
     if (hit) {
       gameOver();
       break;
     }
   }
 
-
+  //sees collisions with the fast trains and chicken
   for (let j = 0; j < fastTrainArray.length; j++) {
     let fTrain = fastTrainArray[j];
     let fTrainX = fTrain.x;
@@ -832,16 +871,19 @@ function checkCollisions() {
     let fTrainW = fTrain.w;
     let fTrainH = fTrain.h;
     let hit = collideRectRect(playerX, playerY, playerW, playerH, fTrainX, fTrainY, fTrainW, fTrainH);
+
+    //game oveer if there is a collision between train and chicken
     if (hit) {
       gameOver();
       break;
     }
   }
 
+  //sets variables required for collision between chicken and log
   chicken.horizontalSpeed = 0;
-
   let isOnLog = false;
 
+  //checks collision between chicken and logs
   for (let k = 0; k < logArray.length; k++) {
     let log = logArray[k];
     let logX = log.x;
@@ -850,17 +892,21 @@ function checkCollisions() {
     let logH = log.h;
     let onLog = collideRectRect(playerX + 10, playerY, playerW - 20, playerH, logX, logY, logW, logH);
 
+    // if th chicken and log collide
     if (onLog) {
       chicken.horizontalSpeed = log.speed;
       isOnLog = true;
+
+      //if the chicken goes with the log outside the screen, game is over
       if (chicken.x > width || chicken.x < 0) {
         gameOver();
       }
       break;
     }
-
-
   }
+
+  //if chicken is not on log and is in a river row
+  //game is over
   if (!isOnLog) {
     for (let r of rows) {
       if (r.type === "river") {
@@ -873,12 +919,15 @@ function checkCollisions() {
   }
 }
 
+//function that sets up a new game
 function newGame() {
 
+  //stops the death music
   if (deathMusic && deathMusic.isPlaying()) {
     deathMusic.stop();
   }
 
+  //resets all the crucial variables
   carArray = [];
   logArray = [];
   trainArray = [];
@@ -891,6 +940,7 @@ function newGame() {
   currentDirection = "front";
   chicken = new Player();
 
+  //generates all the initial row
   let totalRows = Math.ceil(height / gridSize) + 5;
   for (let i = 0; i < totalRows; i++) {
     let yPos = height - i * gridSize;
@@ -898,6 +948,7 @@ function newGame() {
   }
 }
 
+//when game is over plays the death sound
 function gameOver() {
   state = "gameOver";
   if (deathMusic && typeof deathMusic.play === 'function') {
