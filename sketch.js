@@ -5,8 +5,11 @@
 // Extra for Experts:
 //favicon
 //lerp()
-//filter
+//filter to delete objects
+//grayscale
 // setting images as background
+//velocity transfer
+//sound state changing
 
 //setting up the variables for the rest of the code
 let state = "mainMenu";
@@ -332,6 +335,8 @@ function draw() {
   }
 
   else if (state === "gameOver") {
+    displayPlay();
+    filter(GRAY);
     displayGameOver();
   }
 }
