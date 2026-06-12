@@ -263,8 +263,10 @@ class Player {
     this.x += xDirection * gridSize;
     this.y += yDirection * gridSize;
 
+    let screenY = this.y + scrollY;
+
     //decides if the camera(the display) is going to go up or down
-    if (yDirection < 0) {
+    if (yDirection < 0 && screenY < height/2) {
       cameraY += gridSize;
     }
 
@@ -557,7 +559,7 @@ function displayGameOver() {
   //displays the press esc in white
   fill('white');
   textSize((width + height) / 40);
-  text("Press ESC to return to Main Menu", width / 2, height / 2 + 50);
+  text("Press ESC to return to Main Menu\nPress 'R' to Play Again", width / 2, height / 2 + 50);
 }
 
 //when mouse is pressed
@@ -601,6 +603,11 @@ function keyPressed() {
 
   if (keyCode === ESCAPE && state === "gameOver") {
     state = "mainMenu";
+    newGame();
+  }
+
+  else if (state === "gameOver" && key === 'r'){
+    state = "play";
     newGame();
   }
 
